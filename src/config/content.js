@@ -16,4 +16,10 @@ export const DASHBOARD_CONTENT = {
 
     memoriesSubtitle: "Capturing everything since Day 1",
     loadingText: "Loading Shared Content...",
+
+    // LOCK SCREEN CONFIG
+    // Format: YYYY-MM-DD and HH:mm:ss
+    unlockDate: import.meta.env.VITE_UNLOCK_DATE || "2026-02-14",
+    unlockTime: import.meta.env.VITE_UNLOCK_TIME || "00:00:00",
+    timezone: import.meta.env.VITE_TIMEZONE || "UTC", // e.g., "America/New_York", "Europe/London", "UTC"
 };

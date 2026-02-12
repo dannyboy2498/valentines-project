@@ -1,77 +1,112 @@
 import { useState, useEffect } from 'react';
+import { DASHBOARD_CONTENT } from '../config/content';
 
-const useTimeGate = (targetDateString) => {
+const useTimeGate = () => {
   const [timeRemaining, setTimeRemaining] = useState(0);
   const [isLocked, setIsLocked] = useState(true);
-  const [serverOffset, setServerOffset] = useState(0); // Difference between server and local time
+  const [serverOffset, setServerOffset] = useState(0);
+
+  const { unlockDate, unlockTime, timezone } = DASHBOARD_CONTENT;
 
   useEffect(() => {
-    // 1. Check for debug bypass
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('debug') === 'true') {
       setIsLocked(false);
       return;
     }
 
-    // 2. Fetch "Server Time" from Ecuador (America/Guayaquil)
-    // We do this once to get the offset, then clock it locally to avoid API spam.
     const syncWithServer = async () => {
       try {
-        const response = await fetch('https://worldtimeapi.org/api/timezone/America/Guayaquil', {
+        // Use the configured timezone for server sync
+        const response = await fetch(`https://worldtimeapi.org/api/timezone/${timezone}`, {
           cache: 'no-store'
         });
         const data = await response.json();
 
-        // server_time is "2026-02-12T14:45:00.123456-05:00"
         const serverTime = new Date(data.datetime);
         const localTime = new Date();
 
-        // If server says it's 2 PM and local says 3 PM, offset is -1 hour
         setServerOffset(serverTime.getTime() - localTime.getTime());
       } catch (error) {
-        console.warn('Failed to fetch Ecuador server time, falling back to local-to-UTC offset.', error);
-        // Fallback: Assume local clock is roughly correct and just target the ECT timestamp
+        console.warn(`Failed to fetch ${timezone} server time, falling back to local clock.`, error);
       }
     };
 
     syncWithServer();
-  }, []);
+  }, [timezone]);
 
   useEffect(() => {
-    // 1. Bypass check
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('debug') === 'true') {
       setIsLocked(false);
       return;
     }
 
-    // TARGET DATE in Ecuador (UTC-5)
-    // 2026-02-14T00:00:00 in Ecuador is 2026-02-14T05:00:00 UTC
-    // We create the target date explicitly as a UTC date to avoid local timezone weirdness.
-    const targetUTC = new Date('2026-02-14T05:00:00Z').getTime();
+    // Construct the target date
+    // We want to calculate the target time in the specific timezone.
+    // A robust way without heavy libraries is to use the server offset we calculated.
+    // We need to know what the target time is in UTC.
 
-    const updateCountdown = () => {
-      const nowLocal = new Date().getTime();
-      // Apply the offset we got from the server. 
-      // If serverOffset is 0 (fetch failed), we fall back to local clock accuracy.
-      const adjustedNow = nowLocal + serverOffset;
+    const updateCountdown = async () => {
+      try {
+        // To get the target UTC time for a specific date/time in a specific timezone:
+        // We can use the worldtimeapi 'datetime' we already fetched to infer the offset of the target timezone.
+        // But simpler: just use the local time + serverOffset to get "current time in source timezone" 
+        // and compare it to the target date/time string.
 
-      const diff = targetUTC - adjustedNow;
+        // This is tricky without a library. 
+        // Let's assume the user provided something like "2026-02-14T00:00:00" 
+        // and we want that to be in the target timezone.
 
-      if (diff <= 0) {
-        setIsLocked(false);
-        setTimeRemaining(0);
-      } else {
-        setIsLocked(true);
-        setTimeRemaining(diff);
+        // Let's fetch the target timezone's info again if we don't have it to get its UTC offset.
+        const response = await fetch(`https://worldtimeapi.org/api/timezone/${timezone}`);
+        const data = await response.json();
+        const utcOffsetSeconds = data.raw_offset + (data.dst ? data.dst_offset : 0);
+
+        // Target time in UTC is: targetLocalTime - utcOffset
+        const targetDate = new Date(`${unlockDate}T${unlockTime}Z`);
+        const targetUTC = targetDate.getTime() - (utcOffsetSeconds * 1000);
+
+        const internalUpdate = () => {
+          const adjustedNow = new Date().getTime() + serverOffset;
+          const diff = targetUTC - adjustedNow;
+
+          if (diff <= 0) {
+            setIsLocked(false);
+            setTimeRemaining(0);
+          } else {
+            setIsLocked(true);
+            setTimeRemaining(diff);
+          }
+        };
+
+        internalUpdate();
+        const timer = setInterval(internalUpdate, 1000);
+        return () => clearInterval(timer);
+      } catch (e) {
+        // Fallback: Just use local time if API fails
+        const targetUTC = new Date(`${unlockDate}T${unlockTime}`).getTime();
+        const internalUpdate = () => {
+          const diff = targetUTC - new Date().getTime();
+          if (diff <= 0) {
+            setIsLocked(false);
+            setTimeRemaining(0);
+          } else {
+            setIsLocked(true);
+            setTimeRemaining(diff);
+          }
+        };
+        internalUpdate();
+        const timer = setInterval(internalUpdate, 1000);
+        return () => clearInterval(timer);
       }
     };
 
-    updateCountdown();
-    const timer = setInterval(updateCountdown, 1000);
-
-    return () => clearInterval(timer);
-  }, [serverOffset]);
+    const cleanupPromise = updateCountdown();
+    return () => {
+      cleanupPromise.then(cleanup => cleanup && cleanup());
+    };
+  }, [serverOffset, unlockDate, unlockTime, timezone]);
 
   return { isLocked, timeRemaining };
 };
