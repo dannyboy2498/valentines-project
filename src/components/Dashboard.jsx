@@ -3,8 +3,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { reasons } from '../data/reasons';
 import { Heart, MapPin } from 'lucide-react';
 import useTimeGate from '../hooks/useTimeGate';
+import FireworksOverlay from './FireworksOverlay';
 
-const Dashboard = () => {
+const Dashboard = ({ showFireworks = true }) => {
     const [currentReason, setCurrentReason] = useState(reasons[0]);
     const nextVisitDate = '2026-03-01T12:00:00';
     const { timeRemaining } = useTimeGate(nextVisitDate);
@@ -22,8 +23,9 @@ const Dashboard = () => {
     };
 
     return (
-        <div className="min-h-screen py-10 px-4 flex flex-col items-center bg-pink-50">
-            <div className="max-w-xl w-full border-8 border-black bg-white p-8 shadow-[15px_15px_0px_0px_#000]">
+        <div className="min-h-screen py-10 px-4 flex flex-col items-center bg-pink-50 overflow-x-hidden">
+            {showFireworks && <FireworksOverlay />}
+            <div className="max-w-xl w-full border-8 border-black bg-white p-8 shadow-[15px_15px_0px_0px_#000] relative z-10">
                 <header className="text-center mb-12 border-b-8 border-black pb-8">
                     <Heart size={64} className="text-red-500 fill-red-500 mx-auto mb-4" />
                     <h1 className="text-4xl font-black uppercase">She Said Yes!</h1>

@@ -11,5 +11,7 @@ export const IMAGE_ASSETS = {
     gotu: "https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExcTlyOXJ1bzFjenkwNjN0azM4dXZzdnJyb25icmJlcmJjbWZ2dGhwaSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/YdymLnBeyr70rfKqAj/giphy.gif",
 
     // Choose or Die Cat (GIF from Giphy)
-    threat: "https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExcmhlOTJuc3FqbTY3ZTA5ODUzcGZ1aXAxNjV0dmFrdDFyNnNnZXk2diZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/y93x7gLXTO5dnSWCEI/giphy.gif"
+    threat: "https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExcmhlOTJuc3FqbTY3ZTA5ODUzcGZ1aXAxNjV0dmFrdDFyNnNnZXk2diZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/y93x7gLXTO5dnSWCEI/giphy.gif",
+
+    happy: "https://images.unsplash.com/photo-1543852786-1cf6624b9987?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
 };

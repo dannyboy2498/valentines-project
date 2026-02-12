@@ -27,14 +27,12 @@ const LockScreen = ({ onUnlock }) => {
         // Stage 1: Key flight (starts immediately)
         // Stage 2: Lock turns to Unlock (after key lands, ~1.2s)
         setTimeout(() => {
+            // Play success sound IMMEDIATELY as icon changes
+            const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3');
+            audio.volume = 0.5;
+            audio.play().catch(e => { });
+
             setShowUnlockedIcon(true);
-            // Dramatic pop confetti
-            confetti({
-                particleCount: 100,
-                spread: 70,
-                origin: { y: 0.8 },
-                colors: ['#ff0000', '#ffd700', '#ffffff']
-            });
         }, 1200);
 
         // Stage 3: Proceed to Question Screen (total delay ~2.5s)
@@ -118,9 +116,10 @@ const LockScreen = ({ onUnlock }) => {
                 </p>
 
                 {/* LOCK & KEY ANIMATION AREA */}
-                <div className="mb-4 mt-8 bg-pink-100 border-[6px] border-black p-10 shadow-[10px_10px_0px_0px_#000] relative w-48 h-48 flex items-center justify-center">
+                <div className="mb-4 mt-8 bg-pink-100 border-[6px] border-black p-6 shadow-[10px_10px_0px_0px_#000] relative w-36 h-36 flex items-center justify-center z-0">
                     {/* The Lock Icon */}
                     <motion.div
+                        className="relative z-10"
                         animate={showUnlockedIcon ? {
                             scale: [1, 1.3, 1],
                             rotate: [0, -10, 10, 0]
@@ -128,9 +127,9 @@ const LockScreen = ({ onUnlock }) => {
                         transition={{ duration: 0.5 }}
                     >
                         {showUnlockedIcon ? (
-                            <Unlock size={80} className="text-black fill-yellow-400" />
+                            <Unlock size={60} className="text-black relative z-10" />
                         ) : (
-                            <Lock size={80} className="text-black" />
+                            <Lock size={60} className="text-black relative z-10" />
                         )}
                     </motion.div>
 

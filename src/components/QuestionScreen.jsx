@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import confetti from 'canvas-confetti';
 import { AlertCircle } from 'lucide-react';
 import MailSymbol from './MailSymbol';
 import { IMAGE_ASSETS } from '../config/assets';
@@ -162,7 +161,6 @@ const QuestionScreen = ({ onYes }) => {
         }
 
         // Real successful accept
-        confetti({ particleCount: 250, spread: 120, origin: { y: 0.6 } });
         onYes();
     };
 
