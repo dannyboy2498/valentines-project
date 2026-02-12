@@ -9,7 +9,7 @@ export const reasons = [
     "Your silly dance moves that you only show me.",
     "The way you listen even when you don't understand me.",
     "Your passion to just live life and be happy.",
-    "How you always know the right thing to say. Even if it's in a funny way..",
+    "How you always know the right thing to say to make me laugh",
     "Your warm hugs that melt away my stress.",
     "The coffee you make (or how you drink it).",
     "Your resilience in the face of challenges.",
