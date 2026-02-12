@@ -1,21 +1,46 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Lock, Heart, Key, AlertCircle } from 'lucide-react';
+import { Lock, Unlock, Heart, Key, AlertCircle } from 'lucide-react';
+import confetti from 'canvas-confetti';
 
 const LockScreen = ({ onUnlock }) => {
     const [code, setCode] = useState('');
     const [error, setError] = useState(false);
+    const [isUnlocking, setIsUnlocking] = useState(false);
+    const [showUnlockedIcon, setShowUnlockedIcon] = useState(false);
     const CORRECT_CODE = 'ROSES'; // The answer to the riddle
 
     const handleSubmit = (e) => {
         e.preventDefault();
         if (code.toUpperCase() === CORRECT_CODE) {
-            onUnlock();
+            triggerUnlockSequence();
         } else {
             setError(true);
             setTimeout(() => setError(false), 2000);
             setCode('');
         }
+    };
+
+    const triggerUnlockSequence = () => {
+        setIsUnlocking(true);
+
+        // Stage 1: Key flight (starts immediately)
+        // Stage 2: Lock turns to Unlock (after key lands, ~1.2s)
+        setTimeout(() => {
+            setShowUnlockedIcon(true);
+            // Dramatic pop confetti
+            confetti({
+                particleCount: 100,
+                spread: 70,
+                origin: { y: 0.8 },
+                colors: ['#ff0000', '#ffd700', '#ffffff']
+            });
+        }, 1200);
+
+        // Stage 3: Proceed to Question Screen (total delay ~2.5s)
+        setTimeout(() => {
+            onUnlock();
+        }, 2800);
     };
 
     const handleInputChange = (e) => {
@@ -27,7 +52,12 @@ const LockScreen = ({ onUnlock }) => {
         <div className="flex flex-col items-center justify-center min-h-screen w-screen px-4 bg-transparent relative select-none overflow-hidden text-black">
             <motion.div
                 initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
+                animate={{
+                    y: 0,
+                    opacity: 1,
+                    scale: isUnlocking ? [1, 1.02, 1] : 1,
+                    filter: isUnlocking ? 'brightness(1.05)' : 'brightness(1)'
+                }}
                 className="bg-white border-[8px] border-black p-10 shadow-[25px_25px_0px_0px_#000] max-w-md w-full text-center flex flex-col items-center relative"
             >
                 {/* Decorative Badge */}
@@ -40,15 +70,16 @@ const LockScreen = ({ onUnlock }) => {
                 </h1>
 
                 <form onSubmit={handleSubmit} className="w-full flex flex-col items-center">
-                    {/* 1. CODE INPUT */}
+                    {/* CODE INPUT */}
                     <div className="relative w-full mb-8">
                         <input
+                            disabled={isUnlocking}
                             type="text"
                             value={code}
                             onChange={handleInputChange}
                             placeholder="?????"
                             maxLength={5}
-                            className={`w-full bg-gray-50 border-[6px] border-black p-4 text-center text-4xl font-black uppercase tracking-[0.2em] shadow-[8px_8px_0px_0px_#000] outline-none transition-all ${error ? 'border-red-500 text-red-500 animate-shake' : 'focus:bg-white focus:shadow-[12px_12px_0px_0px_#000]'}`}
+                            className={`w-full bg-gray-50 border-[6px] border-black p-4 text-center text-4xl font-black uppercase tracking-[0.2em] shadow-[8px_8px_0px_0px_#000] outline-none transition-all ${error ? 'border-red-500 text-red-500 animate-shake' : 'focus:bg-white focus:shadow-[12px_12px_0px_0px_#000]'} ${isUnlocking ? 'opacity-50' : 'opacity-100'}`}
                         />
 
                         <AnimatePresence>
@@ -66,34 +97,67 @@ const LockScreen = ({ onUnlock }) => {
                         </AnimatePresence>
                     </div>
 
-                    {/* 2. UNLOCK BUTTON */}
+                    {/* UNLOCK BUTTON */}
                     <motion.button
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
+                        disabled={isUnlocking}
+                        whileHover={isUnlocking ? {} : { scale: 1.05 }}
+                        whileTap={isUnlocking ? {} : { scale: 0.95 }}
                         type="submit"
-                        className="w-full bg-yellow-400 hover:bg-yellow-500 text-white font-black py-4 border-[6px] border-black text-2xl shadow-[10px_10px_0px_0px_#000] active:shadow-none active:translate-x-1 active:translate-y-1 transition-all flex items-center justify-center gap-3 uppercase mb-8"
+                        className={`w-full ${isUnlocking ? 'bg-green-500' : 'bg-yellow-400 hover:bg-yellow-500'} text-white font-black py-4 border-[6px] border-black text-2xl shadow-[10px_10px_0px_0px_#000] active:shadow-none active:translate-x-1 active:translate-y-1 transition-all flex items-center justify-center gap-3 uppercase mb-8`}
                     >
-                        Unlock Secret
-                        <Lock size={24} />
+                        {isUnlocking ? 'Unlocking...' : 'Unlock Secret'}
+                        {showUnlockedIcon ? <Unlock size={24} /> : <Lock size={24} />}
                     </motion.button>
                 </form>
 
-                {/* 3. HINT TEXT */}
+                {/* HINT TEXT */}
                 <p className="mt-2 text-black/60 font-bold italic uppercase text-sm tracking-wider">
                     I age quickly, but I'm picked every year. We cannot speak yet I say "I love you".
                     <br /><br />
                     <b className="text-black">What am I?</b>
                 </p>
 
-                {/* 4. LOCK ICON */}
-                <div className="mb-4 mt-8 bg-pink-100 border-[6px] border-black p-6 shadow-[10px_10px_0px_0px_#000] relative">
-                    <Lock size={60} className="text-black" />
+                {/* LOCK & KEY ANIMATION AREA */}
+                <div className="mb-4 mt-8 bg-pink-100 border-[6px] border-black p-10 shadow-[10px_10px_0px_0px_#000] relative w-48 h-48 flex items-center justify-center">
+                    {/* The Lock Icon */}
                     <motion.div
-                        animate={{ scale: [1, 1.2, 1] }}
-                        transition={{ duration: 1.5, repeat: Infinity }}
-                        className="absolute -bottom-2 -right-2 bg-red-500 rounded-full p-2 border-4 border-black shadow-[4px_4px_0px_0px_#000]"
+                        animate={showUnlockedIcon ? {
+                            scale: [1, 1.3, 1],
+                            rotate: [0, -10, 10, 0]
+                        } : {}}
+                        transition={{ duration: 0.5 }}
                     >
-                        <Key size={24} className="text-white" />
+                        {showUnlockedIcon ? (
+                            <Unlock size={80} className="text-black fill-yellow-400" />
+                        ) : (
+                            <Lock size={80} className="text-black" />
+                        )}
+                    </motion.div>
+
+                    {/* The Flying Key */}
+                    <motion.div
+                        initial={false}
+                        animate={isUnlocking ? {
+                            x: [60, -100, -100, 0], // Circular path logic relative to start
+                            y: [60, -60, 60, 0],
+                            rotate: [0, 360, 720, 1080],
+                            scale: [1, 1.5, 0.8, 1],
+                            opacity: [1, 1, 1, 0] // Vanish into the lock
+                        } : {
+                            x: 60,
+                            y: 60,
+                            opacity: 1
+                        }}
+                        transition={{
+                            duration: 1.2,
+                            ease: "easeInOut",
+                            repeat: isUnlocking ? 0 : Infinity,
+                            repeatType: "reverse",
+                            repeatDelay: 1
+                        }}
+                        className="absolute bg-red-500 rounded-full p-3 border-4 border-black shadow-[4px_4px_0px_0px_#000] z-20"
+                    >
+                        <Key size={32} className="text-white" />
                     </motion.div>
                 </div>
 
