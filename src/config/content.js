@@ -1,17 +1,19 @@
 /**
  * DASHBOARD CONTENT CONFIGURATION
- * Use this file to customize the text and personal messages
- * shown in the celebratory dashboard.
+ * 
+ * This file pulls content from environment variables if they exist.
+ * Create a .env file in the root directory and use the keys from .env.example
+ * to set your personal messages without changing the code.
  */
 
 export const DASHBOARD_CONTENT = {
-    // The main heading for the personal note section
-    messageTitle: "Dear Valentine",
+    // Falls back to defaults if .env isn't set
+    messageTitle: import.meta.env.VITE_DASHBOARD_MESSAGE_TITLE || "Dear Valentine",
 
-    // The main message content
-    personalMessage: "Clicking 'Yes' was the best choice you could have made! Happy Valentine's Day! I'm so lucky to have you. ❤️",
+    personalMessage: import.meta.env.VITE_DASHBOARD_PERSONAL_MESSAGE || "Clicking 'Yes' was the best choice you could have made! Happy Valentine's Day! I'm so lucky to have you. ❤️",
 
-    // Any other custom text fields for the dashboard
+    signature: import.meta.env.VITE_DASHBOARD_SIGNATURE || "Love always,",
+
     memoriesSubtitle: "Capturing everything since Day 1",
     loadingText: "Loading Shared Content...",
 };

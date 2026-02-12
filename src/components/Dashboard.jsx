@@ -169,21 +169,53 @@ const Dashboard = ({ showFireworks = true }) => {
                             exit="exit"
                             className={`absolute inset-0 w-full h-full bg-white border-[8px] border-black p-8 flex flex-col overflow-y-auto no-scrollbar transition-all duration-300 ${isHovered ? 'shadow-[40px_40px_0px_0px_rgba(0,0,0,0.2)] -translate-x-2 -translate-y-2' : 'shadow-[20px_20px_0px_0px_#000]'}`}
                         >
-                            <div className="flex items-center gap-3 mb-6 pb-2 border-b-6 border-black">
-                                <Heart size={28} fill="#ec4899" className="text-pink-500" />
-                                <h2 className="text-2xl font-black uppercase italic tracking-tighter">{DASHBOARD_CONTENT.messageTitle}</h2>
-                            </div>
-                            <div className="border-4 border-black p-6 bg-pink-50 shadow-[6px_6px_0px_0px_#000] mb-8">
-                                <p className="text-lg font-black italic text-gray-800 leading-tight">"{DASHBOARD_CONTENT.personalMessage}"</p>
-                            </div>
-                            <div className="border-4 border-black p-6 bg-white shadow-[6px_6px_0px_0px_#000]">
-                                <h2 className="text-lg font-black mb-4 uppercase">Reasons Why I Love You:</h2>
-                                <div className="min-h-[140px] flex items-center justify-center border-4 border-black p-4 bg-pink-50">
-                                    <AnimatePresence mode='wait'>
-                                        <motion.p key={currentReason} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="text-2xl font-black italic text-center">"{currentReason}"</motion.p>
-                                    </AnimatePresence>
+                            <div className="space-y-8">
+                                {/* 1. REASONS AT TOP */}
+                                <div className="border-4 border-black p-6 bg-white shadow-[6px_6px_0px_0px_#000]">
+                                    <h2 className="text-lg font-black mb-4 uppercase flex items-center gap-2">
+                                        <Star size={18} fill="#facc15" className="text-yellow-500" />
+                                        Reasons Why I Love You:
+                                    </h2>
+                                    <div className="min-h-[140px] flex items-center justify-center border-4 border-black p-4 bg-pink-50 relative overflow-hidden">
+                                        <AnimatePresence mode='wait'>
+                                            <motion.p
+                                                key={currentReason}
+                                                initial={{ opacity: 0, scale: 0.9 }}
+                                                animate={{ opacity: 1, scale: 1 }}
+                                                exit={{ opacity: 0, scale: 1.1 }}
+                                                className="text-2xl font-black italic text-center relative z-10"
+                                            >
+                                                {currentReason}
+                                            </motion.p>
+                                        </AnimatePresence>
+                                        <div className="absolute top-2 left-2 opacity-10 pointer-events-none">
+                                            <Heart size={40} fill="currentColor" className="text-pink-300" />
+                                        </div>
+                                    </div>
+                                    <button
+                                        onClick={getNewReason}
+                                        className="mt-6 w-full bg-pink-500 hover:bg-pink-600 text-white font-black py-4 border-4 border-black shadow-[4px_4px_0px_0px_#000] active:translate-x-1 active:translate-y-1 active:shadow-none uppercase"
+                                    >
+                                        TELL ME ANOTHER
+                                    </button>
                                 </div>
-                                <button onClick={getNewReason} className="mt-6 w-full bg-pink-500 hover:bg-pink-600 text-white font-black py-4 border-4 border-black shadow-[4px_4px_0px_0px_#000] active:translate-x-1 active:translate-y-1 active:shadow-none uppercase">TELL ME ANOTHER</button>
+
+                                {/* 2. MESSAGE BELOW */}
+                                <div className="border-4 border-black p-6 bg-pink-50 shadow-[6px_6px_0px_0px_#000]">
+                                    <div className="flex items-center gap-3 mb-4 pb-2 border-b-4 border-black/10">
+                                        <Heart size={24} fill="#ec4899" className="text-pink-500" />
+                                        <h2 className="text-xl font-black uppercase italic">{DASHBOARD_CONTENT.messageTitle}</h2>
+                                    </div>
+
+                                    <p className="text-lg font-black italic text-gray-800 leading-tight mb-8">
+                                        {DASHBOARD_CONTENT.personalMessage}
+                                    </p>
+
+                                    {/* 3. SIGNATURE */}
+                                    <div className="text-right border-t-2 border-black/5 pt-4">
+                                        <p className="font-black text-pink-600 text-xl italic">{DASHBOARD_CONTENT.signature}</p>
+                                    </div>
+                                </div>
                             </div>
                         </motion.div>
                     )}
