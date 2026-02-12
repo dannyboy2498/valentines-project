@@ -1,48 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
-import { Heart, AlertCircle } from 'lucide-react';
+import { AlertCircle } from 'lucide-react';
+import MailSymbol from './MailSymbol';
 
 const MissingImage = ({ label }) => (
     <div className="w-[280px] h-[280px] bg-gray-200 border-4 border-dashed border-gray-400 flex flex-col items-center justify-center text-gray-500 font-black uppercase text-sm p-4 text-center italic">
         <AlertCircle size={32} className="mb-2" />
         <span>Missing {label}</span>
         <span className="text-[10px] mt-2 normal-case font-normal">(Drop in /public/images/)</span>
-    </div>
-);
-
-const MailSymbol = () => (
-    <div className="w-[280px] h-[280px] flex items-center justify-center relative">
-        {/* Envelope Body - Subtle Rounded Rect (rounded-lg) with 8px Border */}
-        <div className="w-68 h-42 relative shadow-[10px_10px_0px_0px_#000] bg-white border-[8px] border-black rounded-lg box-border overflow-hidden">
-            <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 60" preserveAspectRatio="none">
-                {/* 1. Underlying Side Base Fills */}
-                <path d="M 0 0 L 50 38 L 0 60 Z" fill="#fff0f3" />
-                <path d="M 100 0 L 50 38 L 100 60 Z" fill="#fff0f3" />
-
-                {/* 2. Bottom Segment Shading */}
-                <path d="M 0 60 L 100 60 L 62 30 L 50 38 L 38 30 Z" fill="#ffccd5" />
-
-                {/* 3. Top Flap Base Fill */}
-                <path d="M 0 0 L 100 0 L 50 40 Z" fill="#fff5f5" />
-
-                {/* 4. Comic Structural Lines - Smaller inner lines (3.5px) to match subtle rounded frame */}
-                {/* Bottom "Legs" of the M */}
-                <path d="M 0 60 L 38 30" fill="none" stroke="black" strokeWidth="3.5" strokeLinecap="round" />
-                <path d="M 100 60 L 62 30" fill="none" stroke="black" strokeWidth="3.5" strokeLinecap="round" />
-
-                {/* 5. Masking Layer */}
-                <path d="M 0 0 L 100 0 L 50 40 Z" fill="#fff5f5" />
-
-                {/* 6. Top Flap "V" - Rendered last */}
-                <path d="M 0 0 L 50 40 L 100 0" fill="none" stroke="black" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-
-            {/* Heart Seal - Perfectly Centered */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
-                <Heart size={110} className="text-red-500 fill-red-500 animate-pulse drop-shadow-[7px_7px_0px_#000]" />
-            </div>
-        </div>
     </div>
 );
 
@@ -72,7 +38,7 @@ const QuestionScreen = ({ onYes }) => {
 
         const winW = window.innerWidth;
         const winH = window.innerHeight;
-        const btnW = 150;
+        const btnW = 200; // Updated to match button width
         const btnH = 80;
         const padding = 20;
         const cardCenterW = winW / 2;
@@ -128,12 +94,12 @@ const QuestionScreen = ({ onYes }) => {
 
     if (showThreat) {
         return (
-            <div className="fixed inset-0 bg-white z-[100] flex flex-col items-center justify-center p-4 select-none overflow-hidden">
+            <div className="fixed inset-0 bg-white z-[100] flex flex-col items-center justify-center p-4 select-none overflow-hidden text-black">
                 <div className="border-[6px] border-black p-4 bg-white shadow-[15px_15px_0px_0px_#000] max-w-lg w-full flex flex-col items-center">
                     <div className="border-4 border-black mb-4 overflow-hidden">
                         {renderImage('threat', 'Accept Or Else Cat')}
                     </div>
-                    <h2 className="text-4xl md:text-6xl font-black text-center mt-2 uppercase italic leading-none drop-shadow-sm text-black">ACCEPT. OR ELSE.</h2>
+                    <h2 className="text-4xl md:text-6xl font-black text-center mt-2 uppercase italic leading-none drop-shadow-sm">ACCEPT. OR ELSE.</h2>
                     <motion.button
                         onClick={handleYesClick}
                         whileTap={{ scale: 0.9 }}
@@ -147,25 +113,26 @@ const QuestionScreen = ({ onYes }) => {
     }
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen w-screen px-4 bg-transparent relative select-none overflow-hidden">
+        <div className="flex flex-col items-center justify-center min-h-screen w-screen px-4 bg-transparent relative select-none overflow-hidden text-black">
             <div className="bg-white border-[8px] border-black p-6 shadow-[20px_20px_0px_0px_#000] max-w-3xl w-full text-center flex flex-col items-center relative">
                 <div className="w-full flex flex-col items-center pointer-events-none">
-                    <div className="mb-6 inline-block overflow-visible">
+                    <div className="inline-block overflow-visible">
                         {getCurrentDisplay()}
                     </div>
 
-                    <h1 className="text-3xl md:text-5xl font-black mb-8 border-b-6 border-black pb-6 uppercase leading-tight w-full tracking-tighter text-[#000]">
+                    <h1 className="text-3xl md:text-5xl font-black mb-4 -mt-2 uppercase leading-tight w-full tracking-tighter">
                         Will you be my Valentine?
                     </h1>
+                    <div className="w-full h-1.5 bg-black mb-8" />
                 </div>
 
-                <div className="flex flex-col md:flex-row items-center justify-center gap-12 relative w-full h-[180px] pb-4">
+                <div className="flex flex-col md:flex-row items-center justify-center gap-24 relative w-full h-[180px] pb-4">
                     <div className="flex items-center justify-center">
                         <motion.button
                             onClick={handleYesClick}
                             animate={{ scale: yesScale }}
                             transition={{ type: "spring", stiffness: 300, damping: 15 }}
-                            className={`bg-green-500 hover:bg-green-600 text-white font-black py-4 px-12 border-4 border-black text-3xl active:translate-x-1 active:translate-y-1 active:shadow-none z-50 whitespace-nowrap transition-shadow ${noCount === 0 ? 'shadow-[8px_8px_0px_0px_#000]' : 'shadow-none'}`}
+                            className={`bg-green-500 hover:bg-green-600 text-white font-black py-4 px-12 border-4 border-black text-3xl active:translate-x-1 active:translate-y-1 active:shadow-none z-50 whitespace-nowrap transition-shadow w-48 ${noCount === 0 ? 'shadow-[8px_8px_0px_0px_#000]' : 'shadow-none'}`}
                         >
                             YES!
                         </motion.button>
@@ -180,7 +147,7 @@ const QuestionScreen = ({ onYes }) => {
                                 animate={position}
                                 exit={{ opacity: 0, scale: 0 }}
                                 transition={{ type: "spring", stiffness: 450, damping: 25 }}
-                                className={`bg-red-500 hover:bg-red-600 text-white font-black py-4 px-12 border-4 border-black text-3xl shadow-[8px_8px_0px_0px_#000] ${hasStartedRunning ? 'absolute' : 'relative md:static'} z-40 whitespace-nowrap`}
+                                className={`bg-red-500 hover:bg-red-600 text-white font-black py-4 px-12 border-4 border-black text-3xl shadow-[8px_8px_0px_0px_#000] ${hasStartedRunning ? 'absolute' : 'relative md:static'} z-40 whitespace-nowrap w-48`}
                             >
                                 NO
                             </motion.button>
