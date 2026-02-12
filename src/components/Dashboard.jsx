@@ -4,6 +4,7 @@ import { reasons } from '../data/reasons';
 import { Heart, MapPin } from 'lucide-react';
 import useTimeGate from '../hooks/useTimeGate';
 import FireworksOverlay from './FireworksOverlay';
+import { IMAGE_ASSETS } from '../config/assets';
 
 const Dashboard = ({ showFireworks = true }) => {
     const [currentReason, setCurrentReason] = useState(reasons[0]);
@@ -68,7 +69,7 @@ const Dashboard = ({ showFireworks = true }) => {
 
                         <div className="border-4 border-black p-1 bg-white shadow-[8px_8px_0px_0px_#000]">
                             <img
-                                src="https://images.unsplash.com/photo-1543852786-1cf6624b9987?w=400&h=300&fit=crop"
+                                src={IMAGE_ASSETS.dashboard_hero}
                                 alt="Happy"
                                 className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all border-2 border-black"
                             />
