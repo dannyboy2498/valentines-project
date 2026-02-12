@@ -5,7 +5,7 @@ import { AlertCircle } from 'lucide-react';
 import MailSymbol from './MailSymbol';
 
 const MissingImage = ({ label }) => (
-    <div className="w-[280px] h-[280px] bg-gray-200 border-4 border-dashed border-gray-400 flex flex-col items-center justify-center text-gray-500 font-black uppercase text-sm p-4 text-center italic">
+    <div className="w-[300px] h-[300px] bg-gray-200 border-4 border-dashed border-gray-400 flex flex-col items-center justify-center text-gray-500 font-black uppercase text-sm p-4 text-center italic">
         <AlertCircle size={32} className="mb-2" />
         <span>Missing {label}</span>
         <span className="text-[10px] mt-2 normal-case font-normal">(Drop in /public/images/)</span>
@@ -15,22 +15,46 @@ const MissingImage = ({ label }) => (
 const QuestionScreen = ({ onYes }) => {
     const [noCount, setNoCount] = useState(0);
     const [position, setPosition] = useState({ x: 0, y: 0 });
-    const [showThreat, setShowThreat] = useState(false);
     const [isVanish, setIsVanish] = useState(false);
     const [yesScale, setYesScale] = useState(1);
     const [hasStartedRunning, setHasStartedRunning] = useState(false);
+    const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
 
     const noBtnRef = useRef(null);
 
+    // Auto-progression logic for the "Endgame" stages
     useEffect(() => {
+        if (noCount === 8) {
+            const timer = setTimeout(() => setNoCount(9), 5000);
+            return () => clearTimeout(timer);
+        }
+        if (noCount === 9) {
+            const timer = setTimeout(() => setNoCount(10), 5000);
+            return () => clearTimeout(timer);
+        }
+    }, [noCount]);
+
+    // Mouse tracking for the "Accept or Else" chase
+    useEffect(() => {
+        if (noCount >= 10) {
+            const handleMouseMove = (e) => {
+                setMousePos({ x: e.clientX, y: e.clientY });
+            };
+            window.addEventListener('mousemove', handleMouseMove);
+            return () => window.removeEventListener('mousemove', handleMouseMove);
+        }
+    }, [noCount]);
+
+    useEffect(() => {
+        // 35% growth per interaction
         setYesScale(1 + noCount * 0.35);
-        if (noCount === 8) setIsVanish(true);
-        if (noCount >= 10) setTimeout(() => setShowThreat(true), 300);
     }, [noCount]);
 
     const handleNoInteraction = () => {
-        if (noCount >= 8) {
+        // The 8th hit (noCount=7) makes it vanish
+        if (noCount >= 7) {
             setIsVanish(true);
+            setNoCount(8);
             return;
         }
 
@@ -38,17 +62,18 @@ const QuestionScreen = ({ onYes }) => {
 
         const winW = window.innerWidth;
         const winH = window.innerHeight;
-        const btnW = 200; // Updated to match button width
+        const btnW = 200;
         const btnH = 80;
-        const padding = 20;
+        const safePadding = 50;
+
+        const targetAbsX = safePadding + Math.random() * (winW - btnW - safePadding * 2);
+        const targetAbsY = safePadding + Math.random() * (winH - btnH - safePadding * 2);
+
         const cardCenterW = winW / 2;
         const cardCenterH = winH / 2;
 
-        const targetAbsX = padding + Math.random() * (winW - btnW - padding * 2);
-        const targetAbsY = padding + Math.random() * (winH - btnH - padding * 2);
-
         const newX = targetAbsX - (cardCenterW - btnW / 2);
-        const newY = targetAbsY - (cardCenterH + 100);
+        const newY = targetAbsY - (cardCenterH + 150);
 
         setPosition({ x: newX, y: newY });
         setNoCount(prev => prev + 1);
@@ -77,13 +102,13 @@ const QuestionScreen = ({ onYes }) => {
         if (imageErrors[key]) return <MissingImage label={label} />;
         return (
             <img src={imageAssets[key]} alt={label}
-                className="w-[280px] h-[280px] object-cover border-4 border-black"
+                className="w-[280px] h-[280px] object-cover border-4 border-black shadow-[8px_8px_0px_0px_#000]"
                 onError={() => handleImageError(key)} />
         );
     };
 
     const getCurrentDisplay = () => {
-        if (showThreat) return renderImage('threat', 'Accept Or Else Cat');
+        if (noCount >= 10) return renderImage('threat', 'Accept Or Else Cat');
         if (noCount === 0) return renderImage('heart', 'Letter');
         if (noCount < 3) return renderImage('please1', 'Please Cat 1');
         if (noCount < 5) return renderImage('please2', 'Please Cat 2');
@@ -92,50 +117,65 @@ const QuestionScreen = ({ onYes }) => {
         return renderImage('gotu', 'Got U Cat');
     };
 
-    if (showThreat) {
-        return (
-            <div className="fixed inset-0 bg-white z-[100] flex flex-col items-center justify-center p-4 select-none overflow-hidden text-black">
-                <div className="border-[6px] border-black p-4 bg-white shadow-[15px_15px_0px_0px_#000] max-w-lg w-full flex flex-col items-center">
-                    <div className="border-4 border-black mb-4 overflow-hidden">
-                        {renderImage('threat', 'Accept Or Else Cat')}
-                    </div>
-                    <h2 className="text-4xl md:text-6xl font-black text-center mt-2 uppercase italic leading-none drop-shadow-sm">ACCEPT. OR ELSE.</h2>
-                    <motion.button
-                        onClick={handleYesClick}
-                        whileTap={{ scale: 0.9 }}
-                        className="mt-8 mb-4 bg-green-500 hover:bg-green-600 text-white font-black py-6 px-16 border-6 border-black text-4xl animate-pulse"
-                    >
-                        YES!
-                    </motion.button>
-                </div>
-            </div>
-        );
-    }
+    const getDynamicText = () => {
+        if (noCount === 0) return "Will you be my Valentine?";
+        if (noCount === 1) return "please?";
+        if (noCount === 2) return "please??";
+        if (noCount >= 3 && noCount < 5) return "PLEASE???";
+        if (noCount < 7) return "Don't do this to me!";
+        if (noCount === 7) return "This is your final warning.";
+        if (noCount === 8) return "haha got you now!";
+        if (noCount === 9) return "yeah. what are you going to do?";
+        return "ACCEPT OR ELSE.";
+    };
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen w-screen px-4 bg-transparent relative select-none overflow-hidden text-black">
-            <div className="bg-white border-[8px] border-black p-6 shadow-[20px_20px_0px_0px_#000] max-w-3xl w-full text-center flex flex-col items-center relative">
+            <div className="bg-white border-[8px] border-black p-8 shadow-[25px_25px_0px_0px_#000] max-w-4xl max-h-[90vh] w-full text-center flex flex-col items-center justify-between relative overflow-hidden">
+
                 <div className="w-full flex flex-col items-center pointer-events-none">
-                    <div className="inline-block overflow-visible">
-                        {getCurrentDisplay()}
+                    {/* Display Area */}
+                    <div className="h-[300px] flex items-center justify-center mb-6">
+                        <div className="inline-block overflow-visible">
+                            {getCurrentDisplay()}
+                        </div>
                     </div>
 
-                    <h1 className="text-3xl md:text-5xl font-black mb-4 -mt-2 uppercase leading-tight w-full tracking-tighter">
-                        Will you be my Valentine?
-                    </h1>
-                    <div className="w-full h-1.5 bg-black mb-8" />
+                    {/* Dynamic Text Area - Increased padding-bottom (pb-12) to stay clear of huge buttons */}
+                    <div className="h-[120px] pb-12 flex items-center justify-center relative z-10">
+                        <h1 className="text-4xl md:text-6xl font-black uppercase leading-tight w-full tracking-tighter">
+                            {getDynamicText()}
+                        </h1>
+                    </div>
                 </div>
 
-                <div className="flex flex-col md:flex-row items-center justify-center gap-24 relative w-full h-[180px] pb-4">
+                {/* Action Area */}
+                <div className="flex flex-col md:flex-row items-center justify-center gap-24 relative w-full h-[250px] pb-6">
                     <div className="flex items-center justify-center">
-                        <motion.button
-                            onClick={handleYesClick}
-                            animate={{ scale: yesScale }}
-                            transition={{ type: "spring", stiffness: 300, damping: 15 }}
-                            className={`bg-green-500 hover:bg-green-600 text-white font-black py-4 px-12 border-4 border-black text-3xl active:translate-x-1 active:translate-y-1 active:shadow-none z-50 whitespace-nowrap transition-shadow w-48 ${noCount === 0 ? 'shadow-[8px_8px_0px_0px_#000]' : 'shadow-none'}`}
-                        >
-                            YES!
-                        </motion.button>
+                        {noCount < 10 ? (
+                            <motion.button
+                                onClick={handleYesClick}
+                                animate={{ scale: yesScale }}
+                                transition={{ type: "spring", stiffness: 300, damping: 15 }}
+                                className={`bg-green-500 hover:bg-green-600 text-white font-black py-5 px-16 border-6 border-black text-3xl active:translate-x-1 active:translate-y-1 active:shadow-none z-10 whitespace-nowrap transition-shadow w-52 ${noCount === 0 ? 'shadow-[10px_10px_0px_0px_#000]' : 'shadow-none'}`}
+                            >
+                                YES!
+                            </motion.button>
+                        ) : (
+                            /* The "ACCEPT OR ELSE" Chase Button */
+                            <motion.button
+                                onClick={handleYesClick}
+                                animate={{
+                                    x: mousePos.x - (window.innerWidth / 2),
+                                    y: mousePos.y - (window.innerHeight / 2) - 100, // Offset so cursor is over button
+                                    scale: yesScale
+                                }}
+                                transition={{ type: "spring", stiffness: 500, damping: 30, mass: 0.5 }}
+                                className="fixed bg-green-500 hover:bg-green-600 text-white font-black py-5 px-16 border-6 border-black text-4xl shadow-[10px_10px_0px_0px_#000] z-[200] whitespace-nowrap w-64 animate-pulse"
+                            >
+                                YES!
+                            </motion.button>
+                        )}
                     </div>
 
                     <AnimatePresence>
@@ -145,9 +185,9 @@ const QuestionScreen = ({ onYes }) => {
                                 onHoverStart={handleNoInteraction}
                                 onMouseDown={handleNoInteraction}
                                 animate={position}
-                                exit={{ opacity: 0, scale: 0 }}
+                                exit={{ opacity: 0, scale: 0, rotate: 180 }}
                                 transition={{ type: "spring", stiffness: 450, damping: 25 }}
-                                className={`bg-red-500 hover:bg-red-600 text-white font-black py-4 px-12 border-4 border-black text-3xl shadow-[8px_8px_0px_0px_#000] ${hasStartedRunning ? 'absolute' : 'relative md:static'} z-40 whitespace-nowrap w-48`}
+                                className={`bg-red-500 hover:bg-red-600 text-white font-black py-5 px-16 border-6 border-black text-3xl shadow-[10px_10px_0px_0px_#000] ${hasStartedRunning ? 'fixed z-[100]' : 'relative md:static z-[60]'} whitespace-nowrap w-52 pointer-events-auto`}
                             >
                                 NO
                             </motion.button>

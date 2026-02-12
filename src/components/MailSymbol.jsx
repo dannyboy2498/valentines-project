@@ -2,9 +2,11 @@ import React from 'react';
 import { Heart } from 'lucide-react';
 
 const MailSymbol = () => (
-    <div className="w-[280px] h-[280px] flex items-center justify-center relative">
+    /* Vertically shifted slightly down within the 280px container to be closer to text */
+    <div className="w-[280px] h-[280px] flex items-center justify-center relative pt-8">
         {/* Envelope Body - Subtle Rounded Rect (rounded-lg) with 8px Border */}
-        <div className="w-68 h-42 relative shadow-[10px_10px_0px_0px_#000] bg-white border-[8px] border-black rounded-lg box-border overflow-hidden">
+        {/* Scaled up 1.2x to match the visual presence of the square cat memes */}
+        <div className="w-72 h-44 relative shadow-[10px_10px_0px_0px_#000] bg-white border-[8px] border-black rounded-lg box-border overflow-hidden scale-110">
             <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 60" preserveAspectRatio="none">
                 {/* 1. Underlying Side Base Fills */}
                 <path d="M 0 0 L 50 38 L 0 60 Z" fill="#fff0f3" />
