@@ -28,6 +28,14 @@ const QuestionScreen = ({ onYes }) => {
     const mouseMoveTimeout = useRef(null);
 
     const noBtnRef = useRef(null);
+    const [isInteractionBlocked, setIsInteractionBlocked] = useState(false);
+
+    // Block interaction briefly when the question changes
+    useEffect(() => {
+        setIsInteractionBlocked(true);
+        const timer = setTimeout(() => setIsInteractionBlocked(false), 500); // 500ms safety buffer
+        return () => clearTimeout(timer);
+    }, [noCount]);
 
     // Enter/Exit trick stage
     useEffect(() => {
@@ -78,6 +86,7 @@ const QuestionScreen = ({ onYes }) => {
     }, [noCount]);
 
     const handleNoClick = () => {
+        if (isInteractionBlocked) return;
         if (noCount === 0) {
             setNoCount(1);
             return;
@@ -94,6 +103,7 @@ const QuestionScreen = ({ onYes }) => {
     };
 
     const handleNoHover = () => {
+        if (isInteractionBlocked) return;
         // Growth/Jumping only happens from stage 3 onwards
         if (noCount < 3) return;
 
@@ -180,6 +190,8 @@ const QuestionScreen = ({ onYes }) => {
     const getCurrentDisplay = () => {
         if (noCount >= 15) return renderImage('threat', 'Accept Or Else Cat');
         if (noCount === 0) return renderImage('heart', 'Letter');
+        if (noCount === 1) return null;
+        if (noCount === 2) return renderImage('rusure', 'Are You Sure?');
         if (noCount === 3) return renderImage('why', 'Why Not Cat');
         if (noCount === 4) return renderImage('please1', 'Please Cat 1');
         if (noCount === 5) return renderImage('please2', 'Please Cat 2');
