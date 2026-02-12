@@ -35,22 +35,12 @@ const LockScreen = ({ onUnlock }) => {
                     <span className="text-xl italic uppercase">Almost there</span>
                 </div>
 
-                <div className="mb-8 mt-4 bg-pink-100 border-[6px] border-black p-6 shadow-[10px_10px_0px_0px_#000] relative">
-                    <Lock size={60} className="text-black" />
-                    <motion.div
-                        animate={{ scale: [1, 1.2, 1] }}
-                        transition={{ duration: 1.5, repeat: Infinity }}
-                        className="absolute -bottom-2 -right-2 bg-red-500 rounded-full p-2 border-4 border-black shadow-[4px_4px_0px_0px_#000]"
-                    >
-                        <Key size={24} className="text-white" />
-                    </motion.div>
-                </div>
-
-                <h1 className="text-3xl md:text-5xl font-black mb-8 uppercase leading-tight tracking-tighter">
+                <h1 className="text-3xl md:text-5xl font-black mb-8 mt-4 uppercase leading-tight tracking-tighter">
                     Enter Your Code
                 </h1>
 
                 <form onSubmit={handleSubmit} className="w-full flex flex-col items-center">
+                    {/* 1. CODE INPUT */}
                     <div className="relative w-full mb-8">
                         <input
                             type="text"
@@ -76,22 +66,36 @@ const LockScreen = ({ onUnlock }) => {
                         </AnimatePresence>
                     </div>
 
+                    {/* 2. UNLOCK BUTTON */}
                     <motion.button
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         type="submit"
-                        className="w-full bg-yellow-400 hover:bg-yellow-500 text-white font-black py-4 border-[6px] border-black text-2xl shadow-[10px_10px_0px_0px_#000] active:shadow-none active:translate-x-1 active:translate-y-1 transition-all flex items-center justify-center gap-3 uppercase"
+                        className="w-full bg-yellow-400 hover:bg-yellow-500 text-white font-black py-4 border-[6px] border-black text-2xl shadow-[10px_10px_0px_0px_#000] active:shadow-none active:translate-x-1 active:translate-y-1 transition-all flex items-center justify-center gap-3 uppercase mb-8"
                     >
-                        Unlock Page
+                        Unlock Secret
                         <Lock size={24} />
                     </motion.button>
                 </form>
 
-                <p className="mt-10 text-black/40 font-bold italic uppercase text-sm tracking-wider">
+                {/* 3. HINT TEXT */}
+                <p className="mt-2 text-black/60 font-bold italic uppercase text-sm tracking-wider">
                     I age quickly, but I'm picked every year. We cannot speak yet I say "I love you".
                     <br /><br />
-                    <b>What am I?</b>
+                    <b className="text-black">What am I?</b>
                 </p>
+
+                {/* 4. LOCK ICON */}
+                <div className="mb-4 mt-8 bg-pink-100 border-[6px] border-black p-6 shadow-[10px_10px_0px_0px_#000] relative">
+                    <Lock size={60} className="text-black" />
+                    <motion.div
+                        animate={{ scale: [1, 1.2, 1] }}
+                        transition={{ duration: 1.5, repeat: Infinity }}
+                        className="absolute -bottom-2 -right-2 bg-red-500 rounded-full p-2 border-4 border-black shadow-[4px_4px_0px_0px_#000]"
+                    >
+                        <Key size={24} className="text-white" />
+                    </motion.div>
+                </div>
 
                 {/* Comic dots/texture decoration */}
                 <div className="absolute top-4 right-4 grid grid-cols-2 gap-1 opacity-20">
