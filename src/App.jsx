@@ -7,14 +7,13 @@ import Dashboard from './components/Dashboard';
 function App() {
   // CONFIGURATION
   // -----------------------------------------------------------------
-  const TARGET_DATE = '2026-02-14T00:00:00';
+  // The hook now handles the Ecuador (UTC-5) timezone logic internally.
+  const TARGET_DATE = '2026-02-14T00:00:00-05:00';
 
   // BYPASS LOGIC:
-  // 1. URL Parameter: ?debug=true
-  // 2. Development Mode: Bypass if running in dev environment (optional, but requested)
-  const isDev = import.meta.env.DEV;
+  // Use ?debug=true in URL to skip the countdown for testing.
   const urlParams = new URLSearchParams(window.location.search);
-  const isForcedUnlock = urlParams.get('debug') === 'true' || isDev;
+  const isForcedUnlock = urlParams.get('debug') === 'true';
 
   const { isLocked, timeRemaining } = useTimeGate(TARGET_DATE);
 
@@ -28,14 +27,14 @@ function App() {
   // -----------------------------------------------------------------
   if (activeLockedState) {
     return (
-      <main className="min-h-screen">
+      <main className="min-h-screen bg-[#fce7f3]">
         <CountdownScreen timeRemaining={timeRemaining} />
       </main>
     );
   }
 
   return (
-    <main className="min-h-screen transition-all duration-1000">
+    <main className="min-h-screen bg-[#fce7f3] transition-all duration-1000">
       {gameState === 'asking' ? (
         <QuestionScreen onYes={() => setGameState('success')} />
       ) : (
