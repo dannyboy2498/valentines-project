@@ -213,7 +213,7 @@ const Dashboard = ({ showFireworks = true }) => {
                                 </div>
 
                                 {/* MESSAGE BOX (NOW BELOW REASONS) */}
-                                <div className="border-4 border-black p-6 bg-pink-50/50 shadow-[6px_6px_0px_0px_#000]">
+                                <div className="border-4 border-black p-6 bg-violet-50 shadow-[6px_6px_0px_0px_#000]">
                                     <p className="text-lg font-black italic text-gray-800 leading-tight mb-8">
                                         {DASHBOARD_CONTENT.personalMessage}
                                     </p>

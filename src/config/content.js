@@ -10,7 +10,7 @@ export const DASHBOARD_CONTENT = {
     // Falls back to defaults if .env isn't set
     messageTitle: import.meta.env.VITE_DASHBOARD_MESSAGE_TITLE || "Dear Valentine",
 
-    personalMessage: import.meta.env.VITE_DASHBOARD_PERSONAL_MESSAGE || "Clicking 'Yes' was the best choice you could have made! Happy Valentine's Day! I'm so lucky to have you. ❤️",
+    personalMessage: import.meta.env.VITE_DASHBOARD_PERSONAL_MESSAGE || "Saying 'Yes' was the best choice you could have made! Happy Valentine's Day! I'm so lucky to have you. ❤️",
 
     signature: import.meta.env.VITE_DASHBOARD_SIGNATURE || "Love always,",
 
