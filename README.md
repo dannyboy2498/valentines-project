@@ -16,7 +16,8 @@ A customizable, interactive Valentine's Day web experience featuring a countdown
 
 All personal content can be managed via the `.env` file without touching the code:
 
-- **Secret Code:** Set `VITE_LOCK_CODE` and a matching `VITE_LOCK_HINT`.
+- **Pronouns:** Set `VITE_PRONOUN` (e.g., "He", "She", "They") to update the success message.
+- **Secret Code:** Set `VITE_LOCK_CODE` (any length) and a matching `VITE_LOCK_HINT`.
 - **Countdown:** Set `VITE_UNLOCK_DATE` (YYYY-MM-DD) to ensure it opens exactly when you want.
 - **Memories:** Add image URLs or local paths to `VITE_MEMORIES_IMAGES`.
 - **Local Images:** Best practice is to drop images directly into the `/public` root folder and reference them as `/your-image.jpg` in the `.env` file. This ensures they are packaged correctly when building with `npm run build`.

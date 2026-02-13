@@ -14,6 +14,9 @@ export const DASHBOARD_CONTENT = {
 
     signature: import.meta.env.VITE_DASHBOARD_SIGNATURE || "Love always,",
 
+    // PRONOUN CONFIG
+    pronoun: import.meta.env.VITE_PRONOUN || "She",
+
     memoriesSubtitle: "Capturing everything since Day 1",
     loadingText: import.meta.env.VITE_MEMORIES_LOADING_TEXT || "Loading Shared Content...",
 

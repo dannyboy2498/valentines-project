@@ -75,9 +75,9 @@ const LockScreen = ({ onUnlock }) => {
                             type="text"
                             value={code}
                             onChange={handleInputChange}
-                            placeholder="?????"
-                            maxLength={5}
-                            className={`w-full bg-gray-50 border-[6px] border-black p-4 text-center text-4xl font-black uppercase tracking-[0.2em] shadow-[8px_8px_0px_0px_#000] outline-none transition-all ${error ? 'border-red-500 text-red-500 animate-shake' : 'focus:bg-white focus:shadow-[12px_12px_0px_0px_#000]'} ${isUnlocking ? 'opacity-50' : 'opacity-100'}`}
+                            placeholder={"?".repeat(CORRECT_CODE.length || 5)}
+                            maxLength={CORRECT_CODE.length || 8}
+                            className={`w-full bg-gray-50 border-[6px] border-black p-4 text-center ${CORRECT_CODE.length > 7 ? 'text-2xl' : 'text-4xl'} font-black uppercase tracking-[0.2em] shadow-[8px_8px_0px_0px_#000] outline-none transition-all ${error ? 'border-red-500 text-red-500 animate-shake' : 'focus:bg-white focus:shadow-[12px_12px_0px_0px_#000]'} ${isUnlocking ? 'opacity-50' : 'opacity-100'}`}
                         />
 
                         <AnimatePresence>

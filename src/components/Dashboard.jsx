@@ -199,7 +199,7 @@ const Dashboard = ({ showFireworks = true }) => {
 
                             <div className="text-center flex-grow flex flex-col items-center justify-center">
                                 <Heart size={24} lg:size={36} className="text-red-500 fill-red-500 mb-1" />
-                                <h1 className="text-2xl lg:text-3xl font-black uppercase tracking-tighter">She Said Yes!</h1>
+                                <h1 className="text-2xl lg:text-3xl font-black uppercase tracking-tighter">{DASHBOARD_CONTENT.pronoun} Said Yes!</h1>
                             </div>
                         </motion.div>
                     )}
