@@ -15,11 +15,22 @@ export const DASHBOARD_CONTENT = {
     signature: import.meta.env.VITE_DASHBOARD_SIGNATURE || "Love always,",
 
     memoriesSubtitle: "Capturing everything since Day 1",
-    loadingText: "Loading Shared Content...",
+    loadingText: import.meta.env.VITE_MEMORIES_LOADING_TEXT || "Loading Shared Content...",
 
     // LOCK SCREEN CONFIG
+    lockCode: import.meta.env.VITE_LOCK_CODE || "ROSES",
+    lockHint: import.meta.env.VITE_LOCK_HINT || "I age quickly, but I'm picked every year. We cannot speak yet say \"I love you\". What am I?",
+
+    // IMAGE CONFIG
+    initialImage: import.meta.env.VITE_INITIAL_IMAGE || null, // If null, uses MailSymbol
+
+    // MEMORIES CONFIG
+    // Provide a comma-separated list of image URLs in your .env file
+    memories: (import.meta.env.VITE_MEMORIES_IMAGES || "").split(",").map(str => str.trim()).filter(Boolean),
+
     // Format: YYYY-MM-DD and HH:mm:ss
     unlockDate: import.meta.env.VITE_UNLOCK_DATE || "2026-02-14",
     unlockTime: import.meta.env.VITE_UNLOCK_TIME || "00:00:00",
     timezone: import.meta.env.VITE_TIMEZONE || "America/Guayaquil", // e.g., "America/Guayaquil", "Europe/London", "UTC"
 };
+

@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Lock, Unlock, Heart, Key, AlertCircle } from 'lucide-react';
-import confetti from 'canvas-confetti';
+import { DASHBOARD_CONTENT } from '../config/content';
 
 const LockScreen = ({ onUnlock }) => {
     const [code, setCode] = useState('');
     const [error, setError] = useState(false);
     const [isUnlocking, setIsUnlocking] = useState(false);
     const [showUnlockedIcon, setShowUnlockedIcon] = useState(false);
-    const CORRECT_CODE = 'ROSES'; // The answer to the riddle
+    const CORRECT_CODE = DASHBOARD_CONTENT.lockCode; // The answer to the riddle
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -110,9 +110,7 @@ const LockScreen = ({ onUnlock }) => {
 
                 {/* HINT TEXT */}
                 <p className="mt-2 text-black/60 font-bold italic uppercase text-sm tracking-wider">
-                    I age quickly, but I'm picked every year. We cannot speak yet I say "I love you".
-                    <br /><br />
-                    <b className="text-black">What am I?</b>
+                    {DASHBOARD_CONTENT.lockHint}
                 </p>
 
                 {/* LOCK & KEY ANIMATION AREA */}

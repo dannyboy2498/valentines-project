@@ -269,22 +269,40 @@ const Dashboard = ({ showFireworks = true }) => {
                             initial="initial"
                             animate="animate"
                             exit="exit"
-                            className={`absolute inset-0 w-full h-full bg-white border-[6px] md:border-[8px] border-black p-4 md:p-8 flex flex-col overflow-y-auto no-scrollbar transition-all duration-300 ${isHovered ? 'shadow-[20px_20px_0px_0px_rgba(0,0,0,0.2)] md:shadow-[40px_40px_0px_0px_rgba(0,0,0,0.2)] -translate-x-1 md:-translate-x-2 -translate-y-1 md:-translate-y-2' : 'shadow-[15px_15px_0px_0px_#000] md:shadow-[20px_20px_0px_0px_#000]'}`}
+                            className={`absolute inset-0 w-full h-full bg-white border-[6px] md:border-[8px] border-black p-4 md:p-8 flex flex-col overflow-hidden transition-all duration-300 ${isHovered ? 'shadow-[20px_20px_0px_0px_rgba(0,0,0,0.2)] md:shadow-[40px_40px_0px_0px_rgba(0,0,0,0.2)] -translate-x-1 md:-translate-x-2 -translate-y-1 md:-translate-y-2' : 'shadow-[15px_15px_0px_0px_#000] md:shadow-[20px_20px_0px_0px_#000]'}`}
                         >
-                            <div className="flex items-center gap-2 md:gap-3 mb-4 md:mb-6 pb-1 md:pb-2 border-b-[4px] md:border-b-6 border-black">
+                            <div className="flex items-center gap-2 md:gap-3 mb-4 md:mb-6 pb-1 md:pb-2 border-b-[4px] md:border-b-6 border-black shrink-0">
                                 <Camera size={20} md:size={28} className="text-yellow-500" />
                                 <h2 className="text-lg md:text-2xl font-black uppercase italic tracking-tighter">Memories</h2>
                             </div>
-                            <div className="grid grid-cols-2 gap-3 md:gap-4">
-                                {[1, 2, 3, 4].map((i) => (
-                                    <div key={i} className="aspect-square border-[3px] md:border-4 border-black bg-gray-100 flex items-center justify-center shadow-[3px_3px_0px_0px_#000] md:shadow-[4px_4px_0px_0px_#000] group relative overflow-hidden">
-                                        <Star className="text-gray-300 group-hover:text-yellow-400 transition-colors" size={24} md:size={32} />
+
+                            {/* Scrollable Gallery Area */}
+                            <div className="flex-grow overflow-y-auto no-scrollbar pr-1">
+                                <div className="grid grid-cols-2 gap-3 md:gap-4 mb-6">
+                                    {DASHBOARD_CONTENT.memories.length > 0 ? (
+                                        DASHBOARD_CONTENT.memories.map((url, i) => (
+                                            <div key={i} className="aspect-square border-[3px] md:border-4 border-black bg-gray-100 shadow-[3px_3px_0px_0px_#000] md:shadow-[4px_4px_0px_0px_#000] relative overflow-hidden group">
+                                                <img src={url} alt={`Memory ${i + 1}`} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110" />
+                                            </div>
+                                        ))
+                                    ) : (
+                                        [1, 2, 3, 4, 5, 6].map((i) => (
+                                            <div key={i} className="aspect-square border-[3px] md:border-4 border-black bg-gray-100 flex items-center justify-center shadow-[3px_3px_0px_0px_#000] md:shadow-[4px_4px_0px_0px_#000] group relative overflow-hidden">
+                                                <Star className="text-gray-300 group-hover:text-yellow-400 transition-colors" size={24} md:size={32} />
+                                            </div>
+                                        ))
+                                    )}
+                                </div>
+
+                                {DASHBOARD_CONTENT.loadingText && (
+                                    <div className="mb-4 border-[3px] md:border-4 border-black p-3 md:p-4 bg-white shadow-[4px_4px_0px_0px_#000] md:shadow-[6px_6px_0px_0px_#000] text-center italic text-[10px] md:text-xs font-black uppercase text-gray-400">
+                                        {DASHBOARD_CONTENT.loadingText}
                                     </div>
-                                ))}
+                                )}
                             </div>
-                            <div className="mt-6 md:mt-8 border-[3px] md:border-4 border-black p-3 md:p-4 bg-white shadow-[4px_4px_0px_0px_#000] md:shadow-[6px_6px_0px_0px_#000] text-center italic text-[10px] md:text-xs font-black uppercase text-gray-400">{DASHBOARD_CONTENT.loadingText}</div>
                         </motion.div>
                     )}
+
                 </AnimatePresence>
             </div>
 

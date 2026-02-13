@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { AlertCircle } from 'lucide-react';
 import MailSymbol from './MailSymbol';
 import { IMAGE_ASSETS } from '../config/assets';
+import { DASHBOARD_CONTENT } from '../config/content';
 
 const MissingImage = ({ label }) => (
     <div className="w-[180px] h-[180px] md:w-[300px] md:h-[300px] bg-gray-200 border-4 border-dashed border-gray-400 flex flex-col items-center justify-center text-gray-500 font-black uppercase text-xs md:text-sm p-4 text-center italic">
@@ -182,15 +183,25 @@ const QuestionScreen = ({ onYes }) => {
 
     const renderImage = (key, label) => {
         const cls = "w-[200px] h-[200px] md:w-[280px] md:h-[280px] object-cover border-4 border-black shadow-[8px_8px_0px_0px_#000]";
-        if (key === 'heart' && (imageErrors[key] || !IMAGE_ASSETS[key])) return <MailSymbol />;
+
+        // Handle Heart/Initial Image specially
+        if (key === 'heart') {
+            if (DASHBOARD_CONTENT.initialImage) {
+                return <img src={DASHBOARD_CONTENT.initialImage} alt={label} className={cls} onError={() => handleImageError(key)} />;
+            }
+            if (IMAGE_ASSETS[key]) {
+                return <img src={IMAGE_ASSETS[key]} alt={label} className={cls} onError={() => handleImageError(key)} />;
+            }
+            return <MailSymbol />;
+        }
+
         if (imageErrors[key]) return <MissingImage label={label} />;
         return <img src={IMAGE_ASSETS[key]} alt={label} className={cls} onError={() => handleImageError(key)} />;
     };
 
     const getCurrentDisplay = () => {
         if (noCount >= 15) return renderImage('threat', 'CAT');
-        if (noCount === 0) return renderImage('heart', 'Letter');
-        if (noCount === 1) return null;
+        if (noCount === 0 || noCount === 1) return renderImage('heart', 'Letter');
         if (noCount === 2) return renderImage('rusure', 'Sure?');
         const cats = ['why', 'please1', 'please2', 'please3', 'stop', 'dontdothis', 'finalwarning', 'gotu'];
         const idx = Math.floor(noCount) - 3;
