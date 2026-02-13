@@ -56,20 +56,20 @@ const LockScreen = ({ onUnlock }) => {
                     scale: isUnlocking ? [1, 1.02, 1] : 1,
                     filter: isUnlocking ? 'brightness(1.05)' : 'brightness(1)'
                 }}
-                className="bg-white border-[8px] border-black p-10 shadow-[25px_25px_0px_0px_#000] max-w-md w-full text-center flex flex-col items-center relative"
+                className="bg-white border-[8px] border-black p-10 shadow-[25px_25px_0px_0px_#000] max-w-md lg:max-w-lg w-full text-center flex flex-col items-center relative"
             >
                 {/* Decorative Badge */}
                 <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-yellow-400 text-black font-black py-2 px-8 border-[6px] border-black shadow-[8px_8px_0px_0px_#000] transform rotate-3 z-10">
                     <span className="text-xl italic uppercase">Almost there</span>
                 </div>
 
-                <h1 className="text-3xl lg:text-5xl font-black mb-8 mt-4 uppercase leading-tight tracking-tighter">
+                <h1 className="text-3xl lg:text-5xl font-black mb-8 mt-10 lg:mt-16 uppercase leading-tight tracking-tighter">
                     Enter Your Code
                 </h1>
 
                 <form onSubmit={handleSubmit} className="w-full flex flex-col items-center">
                     {/* CODE INPUT */}
-                    <div className="relative w-full mb-8">
+                    <div className="relative w-full mb-5">
                         <input
                             disabled={isUnlocking}
                             type="text"
@@ -83,10 +83,10 @@ const LockScreen = ({ onUnlock }) => {
                         <AnimatePresence>
                             {error && (
                                 <motion.div
-                                    initial={{ opacity: 0, y: -10 }}
+                                    initial={{ opacity: 0, y: 5 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     exit={{ opacity: 0 }}
-                                    className="absolute -bottom-10 left-0 right-0 flex items-center justify-center gap-2 text-red-600 font-black uppercase italic"
+                                    className="absolute bottom-[calc(100%+4px)] left-0 right-0 flex items-center justify-center gap-2 text-red-600 font-black uppercase italic"
                                 >
                                     <AlertCircle size={18} />
                                     <span>Invalid Secret Code</span>
@@ -109,7 +109,7 @@ const LockScreen = ({ onUnlock }) => {
                 </form>
 
                 <div
-                    className="mt-2 text-black/60 font-bold italic uppercase text-[12px] lg:text-sm tracking-widest whitespace-pre-line px-4 lg:px-12 leading-tight"
+                    className="mt-2 text-black/60 font-bold italic uppercase text-[12px] lg:text-[16px] tracking-wider whitespace-pre-line px-4 lg:px-2 lg:-mx-6 leading-tight lg:leading-normal w-full max-w-[340px] lg:max-w-none mx-auto"
                     dangerouslySetInnerHTML={{
                         __html: DASHBOARD_CONTENT.lockHint
                             .replace(/\n/g, '<br/>')
