@@ -107,13 +107,13 @@ const Dashboard = ({ showFireworks = true }) => {
     };
 
     return (
-        <div className="min-h-full w-full pt-12 md:pt-20 pb-32 px-4 flex flex-col items-center justify-start bg-transparent overflow-visible relative">
+        <div className="min-h-full w-full pt-12 lg:pt-20 pb-32 px-4 flex flex-col items-center justify-start bg-transparent overflow-visible relative">
             <HeartParticles zIndex={0} />
             {showFireworks && <FireworksOverlay />}
 
             {/* THE VIEW DECK CONTAINER */}
             <div
-                className="relative w-full max-w-lg h-[550px] md:h-[700px] z-10 flex items-center justify-center perspective-1000"
+                className="relative w-full max-w-lg h-[550px] lg:h-[700px] z-10 flex items-center justify-center perspective-1000"
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => {
                     setIsHovered(false);
@@ -139,9 +139,9 @@ const Dashboard = ({ showFireworks = true }) => {
                             initial={{ opacity: 0, scale: 0, rotate: 0 }}
                             animate={{ opacity: 1, scale: 1, rotate: 15 }}
                             exit={{ opacity: 0, scale: 0, rotate: 0 }}
-                            className="absolute -top-4 md:-top-6 -right-6 md:-right-12 z-[100] pointer-events-none"
+                            className="absolute -top-4 lg:-top-6 -right-6 lg:-right-12 z-[100] pointer-events-none"
                         >
-                            <div className="bg-pink-500 text-white font-black uppercase px-6 md:px-12 py-2 md:py-3 border-[3px] md:border-4 border-black shadow-[4px_4px_0px_0px_#000] md:shadow-[8px_8px_0px_0px_#000] whitespace-nowrap text-[10px] md:text-xs tracking-widest">
+                            <div className="bg-pink-500 text-white font-black uppercase px-6 lg:px-12 py-2 lg:py-3 border-[3px] lg:border-4 border-black shadow-[4px_4px_0px_0px_#000] lg:shadow-[8px_8px_0px_0px_#000] whitespace-nowrap text-[10px] lg:text-xs tracking-widest">
                                 Wait, There's More...
                             </div>
                         </motion.div>
@@ -155,10 +155,10 @@ const Dashboard = ({ showFireworks = true }) => {
                             initial={{ opacity: 0, x: -10 }}
                             animate={{ opacity: 1, x: 0 }}
                             exit={{ opacity: 0, x: -10 }}
-                            className={`absolute -right-12 md:-right-16 top-1/2 -translate-y-1/2 z-50 animate-pulse hidden md:block transition-colors duration-200 ${hoverZone === 'right' || hoverZone === 'middle' ? 'text-pink-500' : 'text-gray-300'
+                            className={`absolute -right-12 lg:-right-16 top-1/2 -translate-y-1/2 z-50 animate-pulse hidden lg:block transition-colors duration-200 ${hoverZone === 'right' || hoverZone === 'middle' ? 'text-pink-500' : 'text-gray-300'
                                 }`}
                         >
-                            <ChevronRight size={48} md:size={64} strokeWidth={3} />
+                            <ChevronRight size={48} lg:size={64} strokeWidth={3} />
                         </motion.div>
                     )}
                     {isHovered && activeTab !== 'cover' && (
@@ -166,10 +166,10 @@ const Dashboard = ({ showFireworks = true }) => {
                             initial={{ opacity: 0, x: 10 }}
                             animate={{ opacity: 1, x: 0 }}
                             exit={{ opacity: 0, x: 10 }}
-                            className={`absolute -left-12 md:-left-16 top-1/2 -translate-y-1/2 z-50 animate-pulse hidden md:block transition-colors duration-200 ${hoverZone === 'left' ? 'text-pink-500' : 'text-gray-300'
+                            className={`absolute -left-12 lg:-left-16 top-1/2 -translate-y-1/2 z-50 animate-pulse hidden lg:block transition-colors duration-200 ${hoverZone === 'left' ? 'text-pink-500' : 'text-gray-300'
                                 }`}
                         >
-                            <ChevronLeft size={48} md:size={64} strokeWidth={3} />
+                            <ChevronLeft size={48} lg:size={64} strokeWidth={3} />
                         </motion.div>
                     )}
                 </AnimatePresence>
@@ -183,23 +183,23 @@ const Dashboard = ({ showFireworks = true }) => {
                             initial="initial"
                             animate="animate"
                             exit="exit"
-                            className={`absolute inset-0 w-full h-full bg-white border-[6px] md:border-[8px] border-black p-4 md:p-8 flex flex-col transition-all duration-300 ${isHovered ? 'shadow-[20px_20px_0px_0px_rgba(0,0,0,0.2)] md:shadow-[40px_40px_0px_0px_rgba(0,0,0,0.2)] -translate-x-1 md:-translate-x-2 -translate-y-1 md:-translate-y-2' : 'shadow-[15px_15px_0px_0px_#000] md:shadow-[20px_20px_0px_0px_#000]'}`}
+                            className={`absolute inset-0 w-full h-full bg-white border-[6px] lg:border-[8px] border-black p-4 lg:p-8 flex flex-col transition-all duration-300 ${isHovered ? 'shadow-[20px_20px_0px_0px_rgba(0,0,0,0.2)] lg:shadow-[40px_40px_0px_0px_rgba(0,0,0,0.2)] -translate-x-1 lg:-translate-x-2 -translate-y-1 lg:-translate-y-2' : 'shadow-[15px_15px_0px_0px_#000] lg:shadow-[20px_20px_0px_0px_#000]'}`}
                         >
                             {/* LONG CAT PHOTO (78% height) */}
-                            <div className="w-full h-[70%] md:h-[78%] border-[3px] md:border-4 border-black overflow-hidden bg-gray-100 mb-4 relative">
+                            <div className="w-full h-[70%] lg:h-[78%] border-[3px] lg:border-4 border-black overflow-hidden bg-gray-100 mb-4 relative">
                                 <img src={IMAGE_ASSETS.dashboard_hero} alt="Cover" className="w-full h-full object-cover" />
                                 {isHovered && (
                                     <div className="absolute inset-0 bg-pink-500/10 flex items-center justify-center">
-                                        <div className="bg-white border-[3px] md:border-4 border-black p-3 md:p-4 shadow-[4px_4px_0px_0px_#000] md:shadow-[6px_6px_0px_0px_#000] -rotate-2">
-                                            <p className="font-black uppercase text-sm md:text-xl">Click to see inside!</p>
+                                        <div className="bg-white border-[3px] lg:border-4 border-black p-3 lg:p-4 shadow-[4px_4px_0px_0px_#000] lg:shadow-[6px_6px_0px_0px_#000] -rotate-2">
+                                            <p className="font-black uppercase text-sm lg:text-xl">Click to see inside!</p>
                                         </div>
                                     </div>
                                 )}
                             </div>
 
                             <div className="text-center flex-grow flex flex-col items-center justify-center">
-                                <Heart size={24} md:size={36} className="text-red-500 fill-red-500 mb-1" />
-                                <h1 className="text-2xl md:text-3xl font-black uppercase tracking-tighter">She Said Yes!</h1>
+                                <Heart size={24} lg:size={36} className="text-red-500 fill-red-500 mb-1" />
+                                <h1 className="text-2xl lg:text-3xl font-black uppercase tracking-tighter">She Said Yes!</h1>
                             </div>
                         </motion.div>
                     )}
@@ -212,49 +212,49 @@ const Dashboard = ({ showFireworks = true }) => {
                             initial="initial"
                             animate="animate"
                             exit="exit"
-                            className={`absolute inset-0 w-full h-full bg-white border-[6px] md:border-[8px] border-black p-4 md:p-8 flex flex-col overflow-y-auto no-scrollbar transition-all duration-300 ${isHovered ? 'shadow-[20px_20px_0px_0px_rgba(0,0,0,0.2)] md:shadow-[40px_40px_0px_0px_rgba(0,0,0,0.2)] -translate-x-1 md:-translate-x-2 -translate-y-1 md:-translate-y-2' : 'shadow-[15px_15px_0px_0px_#000] md:shadow-[20px_20px_0px_0px_#000]'}`}
+                            className={`absolute inset-0 w-full h-full bg-white border-[6px] lg:border-[8px] border-black p-4 lg:p-8 flex flex-col overflow-y-auto no-scrollbar transition-all duration-300 ${isHovered ? 'shadow-[20px_20px_0px_0px_rgba(0,0,0,0.2)] lg:shadow-[40px_40px_0px_0px_rgba(0,0,0,0.2)] -translate-x-1 lg:-translate-x-2 -translate-y-1 lg:-translate-y-2' : 'shadow-[15px_15px_0px_0px_#000] lg:shadow-[20px_20px_0px_0px_#000]'}`}
                         >
-                            <div className="space-y-4 md:space-y-6">
+                            <div className="space-y-4 lg:space-y-6">
                                 {/* COMPACT HEADER */}
-                                <div className="flex items-center gap-2 md:gap-3 mb-2 md:mb-4 pb-1 md:pb-2 border-b-[4px] md:border-b-6 border-black">
-                                    <Heart size={20} md:size={28} fill="#ec4899" className="text-pink-500" />
-                                    <h2 className="text-lg md:text-2xl font-black uppercase italic tracking-tighter">{DASHBOARD_CONTENT.messageTitle}</h2>
+                                <div className="flex items-center gap-2 lg:gap-3 mb-2 lg:mb-4 pb-1 lg:pb-2 border-b-[4px] lg:border-b-6 border-black">
+                                    <Heart size={20} lg:size={28} fill="#ec4899" className="text-pink-500" />
+                                    <h2 className="text-lg lg:text-2xl font-black uppercase italic tracking-tighter">{DASHBOARD_CONTENT.messageTitle}</h2>
                                 </div>
 
                                 {/* REASONS BOX (NOW ABOVE MESSAGE) */}
-                                <div className="border-[3px] md:border-4 border-black p-4 md:p-6 bg-white shadow-[4px_4px_0px_0px_#000] md:shadow-[6px_6px_0px_0px_#000]">
-                                    <h2 className="text-xs md:text-lg font-black mb-2 md:mb-4 uppercase tracking-tighter md:tracking-normal">Reasons Why I Love You:</h2>
-                                    <div className="min-h-[100px] md:min-h-[140px] flex items-center justify-center border-[3px] md:border-4 border-black p-3 md:p-4 bg-pink-50 relative overflow-hidden">
+                                <div className="border-[3px] lg:border-4 border-black p-4 lg:p-6 bg-white shadow-[4px_4px_0px_0px_#000] lg:shadow-[6px_6px_0px_0px_#000]">
+                                    <h2 className="text-xs lg:text-lg font-black mb-2 lg:mb-4 uppercase tracking-tighter lg:tracking-normal">Reasons Why I Love You:</h2>
+                                    <div className="min-h-[100px] lg:min-h-[140px] flex items-center justify-center border-[3px] lg:border-4 border-black p-3 lg:p-4 bg-pink-50 relative overflow-hidden">
                                         <AnimatePresence mode='wait'>
                                             <motion.p
                                                 key={currentReason}
                                                 initial={{ opacity: 0 }}
                                                 animate={{ opacity: 1 }}
                                                 exit={{ opacity: 0 }}
-                                                className="text-lg md:text-2xl font-black italic text-center relative z-10 leading-tight"
+                                                className="text-lg lg:text-2xl font-black italic text-center relative z-10 leading-tight"
                                             >
                                                 {currentReason}
                                             </motion.p>
                                         </AnimatePresence>
-                                        <div className="absolute top-1 left-1 md:top-2 md:left-2 opacity-5">
-                                            <Heart size={24} md:size={40} fill="currentColor" className="text-pink-300" />
+                                        <div className="absolute top-1 left-1 lg:top-2 lg:left-2 opacity-5">
+                                            <Heart size={24} lg:size={40} fill="currentColor" className="text-pink-300" />
                                         </div>
                                     </div>
                                     <button
                                         onClick={getNewReason}
-                                        className="mt-4 md:mt-6 w-full bg-pink-500 hover:bg-pink-600 text-white font-black py-3 md:py-4 border-[3px] md:border-4 border-black shadow-[3px_3px_0px_0px_#000] md:shadow-[4px_4px_0px_0px_#000] active:translate-x-1 active:translate-y-1 active:shadow-none uppercase text-xs md:text-base tracking-widest"
+                                        className="mt-4 lg:mt-6 w-full bg-pink-500 hover:bg-pink-600 text-white font-black py-3 lg:py-4 border-[3px] lg:border-4 border-black shadow-[3px_3px_0px_0px_#000] lg:shadow-[4px_4px_0px_0px_#000] active:translate-x-1 active:translate-y-1 active:shadow-none uppercase text-xs lg:text-base tracking-widest"
                                     >
                                         TELL ME ANOTHER
                                     </button>
                                 </div>
 
                                 {/* MESSAGE BOX (NOW BELOW REASONS) */}
-                                <div className="border-[3px] md:border-4 border-black p-4 md:p-6 bg-violet-50 shadow-[4px_4px_0px_0px_#000] md:shadow-[6px_6px_0px_0px_#000]">
-                                    <p className="text-sm md:text-lg font-black italic text-gray-800 leading-[1.2] md:leading-tight mb-4 md:mb-8">
+                                <div className="border-[3px] lg:border-4 border-black p-4 lg:p-6 bg-violet-50 shadow-[4px_4px_0px_0px_#000] lg:shadow-[6px_6px_0px_0px_#000]">
+                                    <p className="text-sm lg:text-lg font-black italic text-gray-800 leading-[1.2] lg:leading-tight mb-4 lg:mb-8">
                                         {DASHBOARD_CONTENT.personalMessage}
                                     </p>
-                                    <div className="text-right border-t-[2px] border-black/10 pt-2 md:pt-4">
-                                        <p className="font-black text-pink-600 text-base md:text-xl italic">{DASHBOARD_CONTENT.signature}</p>
+                                    <div className="text-right border-t-[2px] border-black/10 pt-2 lg:pt-4">
+                                        <p className="font-black text-pink-600 text-base lg:text-xl italic">{DASHBOARD_CONTENT.signature}</p>
                                     </div>
                                 </div>
                             </div>
@@ -269,33 +269,33 @@ const Dashboard = ({ showFireworks = true }) => {
                             initial="initial"
                             animate="animate"
                             exit="exit"
-                            className={`absolute inset-0 w-full h-full bg-white border-[6px] md:border-[8px] border-black p-4 md:p-8 flex flex-col overflow-hidden transition-all duration-300 ${isHovered ? 'shadow-[20px_20px_0px_0px_rgba(0,0,0,0.2)] md:shadow-[40px_40px_0px_0px_rgba(0,0,0,0.2)] -translate-x-1 md:-translate-x-2 -translate-y-1 md:-translate-y-2' : 'shadow-[15px_15px_0px_0px_#000] md:shadow-[20px_20px_0px_0px_#000]'}`}
+                            className={`absolute inset-0 w-full h-full bg-white border-[6px] lg:border-[8px] border-black p-4 lg:p-8 flex flex-col overflow-hidden transition-all duration-300 ${isHovered ? 'shadow-[20px_20px_0px_0px_rgba(0,0,0,0.2)] lg:shadow-[40px_40px_0px_0px_rgba(0,0,0,0.2)] -translate-x-1 lg:-translate-x-2 -translate-y-1 lg:-translate-y-2' : 'shadow-[15px_15px_0px_0px_#000] lg:shadow-[20px_20px_0px_0px_#000]'}`}
                         >
-                            <div className="flex items-center gap-2 md:gap-3 mb-4 md:mb-6 pb-1 md:pb-2 border-b-[4px] md:border-b-6 border-black shrink-0">
-                                <Camera size={20} md:size={28} className="text-yellow-500" />
-                                <h2 className="text-lg md:text-2xl font-black uppercase italic tracking-tighter">Memories</h2>
+                            <div className="flex items-center gap-2 lg:gap-3 mb-4 lg:mb-6 pb-1 lg:pb-2 border-b-[4px] lg:border-b-6 border-black shrink-0">
+                                <Camera size={20} lg:size={28} className="text-yellow-500" />
+                                <h2 className="text-lg lg:text-2xl font-black uppercase italic tracking-tighter">Memories</h2>
                             </div>
 
                             {/* Scrollable Gallery Area */}
                             <div className="flex-grow overflow-y-auto no-scrollbar pr-1">
-                                <div className="grid grid-cols-2 gap-3 md:gap-4 mb-6">
+                                <div className="grid grid-cols-2 gap-3 lg:gap-4 mb-6">
                                     {DASHBOARD_CONTENT.memories.length > 0 ? (
                                         DASHBOARD_CONTENT.memories.map((url, i) => (
-                                            <div key={i} className="aspect-square border-[3px] md:border-4 border-black bg-gray-100 shadow-[3px_3px_0px_0px_#000] md:shadow-[4px_4px_0px_0px_#000] relative overflow-hidden group">
+                                            <div key={i} className="aspect-square border-[3px] lg:border-4 border-black bg-gray-100 shadow-[3px_3px_0px_0px_#000] lg:shadow-[4px_4px_0px_0px_#000] relative overflow-hidden group">
                                                 <img src={url} alt={`Memory ${i + 1}`} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110" />
                                             </div>
                                         ))
                                     ) : (
                                         [1, 2, 3, 4, 5, 6].map((i) => (
-                                            <div key={i} className="aspect-square border-[3px] md:border-4 border-black bg-gray-100 flex items-center justify-center shadow-[3px_3px_0px_0px_#000] md:shadow-[4px_4px_0px_0px_#000] group relative overflow-hidden">
-                                                <Star className="text-gray-300 group-hover:text-yellow-400 transition-colors" size={24} md:size={32} />
+                                            <div key={i} className="aspect-square border-[3px] lg:border-4 border-black bg-gray-100 flex items-center justify-center shadow-[3px_3px_0px_0px_#000] lg:shadow-[4px_4px_0px_0px_#000] group relative overflow-hidden">
+                                                <Star className="text-gray-300 group-hover:text-yellow-400 transition-colors" size={24} lg:size={32} />
                                             </div>
                                         ))
                                     )}
                                 </div>
 
                                 {DASHBOARD_CONTENT.loadingText && (
-                                    <div className="mb-4 border-[3px] md:border-4 border-black p-3 md:p-4 bg-white shadow-[4px_4px_0px_0px_#000] md:shadow-[6px_6px_0px_0px_#000] text-center italic text-[10px] md:text-xs font-black uppercase text-gray-400">
+                                    <div className="mb-4 border-[3px] lg:border-4 border-black p-3 lg:p-4 bg-white shadow-[4px_4px_0px_0px_#000] lg:shadow-[6px_6px_0px_0px_#000] text-center italic text-[10px] lg:text-xs font-black uppercase text-gray-400">
                                         {DASHBOARD_CONTENT.loadingText}
                                     </div>
                                 )}
@@ -307,10 +307,10 @@ const Dashboard = ({ showFireworks = true }) => {
             </div>
 
             {/* GLOBAL NAVIGATION BAR - Now Absolute to scale with AppScaler */}
-            <div className="absolute bottom-6 md:bottom-8 left-0 w-full flex justify-center z-50 pointer-events-none px-4">
+            <div className="absolute bottom-6 lg:bottom-8 left-0 w-full flex justify-center z-50 pointer-events-none px-4">
                 <motion.div
                     layout
-                    className="flex items-center gap-3 md:gap-4 pointer-events-auto bg-white/95 backdrop-blur-sm border-[3px] md:border-4 border-black p-2 md:p-3 shadow-[6px_6px_0px_0px_#000] md:shadow-[8px_8px_0px_0px_#000]"
+                    className="flex items-center gap-3 lg:gap-4 pointer-events-auto bg-white/95 backdrop-blur-sm border-[3px] lg:border-4 border-black p-2 lg:p-3 shadow-[6px_6px_0px_0px_#000] lg:shadow-[8px_8px_0px_0px_#000]"
                 >
                     {tabs.map((tab, idx) => {
                         const Icon = tab === 'cover' ? Home : tab === 'reasons' ? BookHeart : Images;
@@ -330,20 +330,20 @@ const Dashboard = ({ showFireworks = true }) => {
                                 key={tab}
                                 layoutId={`nav-${tab}`}
                                 onClick={() => isDiscovered && handleTabChange(tab)}
-                                className={`w-12 h-12 md:w-14 md:h-14 flex items-center justify-center transition-all ${!isDiscovered
+                                className={`w-12 h-12 lg:w-14 lg:h-14 flex items-center justify-center transition-all ${!isDiscovered
                                     ? 'bg-transparent border-none cursor-default'
-                                    : `border-[3px] md:border-4 border-black ${isActive
+                                    : `border-[3px] lg:border-4 border-black ${isActive
                                         ? `${colorClass} ${textColor} shadow-none translate-x-1 translate-y-1`
-                                        : 'bg-white hover:bg-pink-50 shadow-[3px_3px_0px_0px_#000] md:shadow-[4px_4px_0px_0px_#000]'}`
+                                        : 'bg-white hover:bg-pink-50 shadow-[3px_3px_0px_0px_#000] lg:shadow-[4px_4px_0px_0px_#000]'}`
                                     }`}
                             >
                                 {isDiscovered ? (
-                                    <Icon size={24} md:size={28} />
+                                    <Icon size={24} lg:size={28} />
                                 ) : (
                                     <motion.div
                                         initial={{ scale: 0 }}
                                         animate={{ scale: 1 }}
-                                        className="w-8 h-8 md:w-9 md:h-9 bg-gray-200 border-[3px] md:border-4 border-black shadow-[2px_2px_0px_0px_#000] rotate-6"
+                                        className="w-8 h-8 lg:w-9 lg:h-9 bg-gray-200 border-[3px] lg:border-4 border-black shadow-[2px_2px_0px_0px_#000] rotate-6"
                                     />
                                 )}
                             </motion.button>

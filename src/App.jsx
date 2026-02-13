@@ -12,6 +12,7 @@ const AppScaler = ({ children }) => {
 
   useEffect(() => {
     const handleResize = () => {
+      // Synchronized with Tailwind's 'lg' breakpoint (1024px)
       const isMobile = window.innerWidth < 1024;
 
       // We define a "Safe Stage" that we want to preserve.

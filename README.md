@@ -18,8 +18,16 @@ All personal content can be managed via the `.env` file without touching the cod
 
 - **Secret Code:** Set `VITE_LOCK_CODE` and a matching `VITE_LOCK_HINT`.
 - **Countdown:** Set `VITE_UNLOCK_DATE` (YYYY-MM-DD) to ensure it opens exactly when you want.
-- **Memories:** Add a comma-separated list of image URLs to `VITE_MEMORIES_IMAGES` to populate the gallery.
+- **Memories:** Add image URLs or local paths to `VITE_MEMORIES_IMAGES`.
+- **Local Images:** Best practice is to drop images directly into the `/public` root folder and reference them as `/your-image.jpg` in the `.env` file. This ensures they are packaged correctly when building with `npm run build`.
 - **Messages:** Update the titles and personal notes in the Dashboard.
+
+## 📦 Packaging for Release
+
+When sharing this project, you should:
+1. **Add Sample Images:** Place `cover.jpg`, `memory1.jpg`, etc., in the `/public` folder.
+2. **Setup .env.example:** Ensure it points to these filenames so the recipient just has to swap their own files into `/public` with the same names.
+3. **Build:** Running `npm run build` will generate a `dist` folder containing everything needed to host the site (including your images).
 
 ## 🤫 Giving a Preview (Without Spoilers)
 

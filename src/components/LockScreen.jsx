@@ -63,7 +63,7 @@ const LockScreen = ({ onUnlock }) => {
                     <span className="text-xl italic uppercase">Almost there</span>
                 </div>
 
-                <h1 className="text-3xl md:text-5xl font-black mb-8 mt-4 uppercase leading-tight tracking-tighter">
+                <h1 className="text-3xl lg:text-5xl font-black mb-8 mt-4 uppercase leading-tight tracking-tighter">
                     Enter Your Code
                 </h1>
 

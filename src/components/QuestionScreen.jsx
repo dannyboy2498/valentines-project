@@ -6,10 +6,10 @@ import { IMAGE_ASSETS } from '../config/assets';
 import { DASHBOARD_CONTENT } from '../config/content';
 
 const MissingImage = ({ label }) => (
-    <div className="w-[180px] h-[180px] md:w-[300px] md:h-[300px] bg-gray-200 border-4 border-dashed border-gray-400 flex flex-col items-center justify-center text-gray-500 font-black uppercase text-xs md:text-sm p-4 text-center italic">
+    <div className="w-[180px] h-[180px] lg:w-[300px] lg:h-[300px] bg-gray-200 border-4 border-dashed border-gray-400 flex flex-col items-center justify-center text-gray-500 font-black uppercase text-xs lg:text-sm p-4 text-center italic">
         <AlertCircle size={32} className="mb-2" />
         <span>Missing {label}</span>
-        <span className="text-[10px] mt-2 normal-case font-normal">(Drop in /public/images/)</span>
+        <span className="text-[10px] mt-2 normal-case font-normal">(Drop in /public/)</span>
     </div>
 );
 
@@ -182,7 +182,7 @@ const QuestionScreen = ({ onYes }) => {
     const handleImageError = (key) => setImageErrors(prev => ({ ...prev, [key]: true }));
 
     const renderImage = (key, label) => {
-        const cls = "w-[200px] h-[200px] md:w-[280px] md:h-[280px] object-cover border-4 border-black shadow-[8px_8px_0px_0px_#000]";
+        const cls = "w-[200px] h-[200px] lg:w-[280px] lg:h-[280px] object-cover border-4 border-black shadow-[8px_8px_0px_0px_#000]";
 
         // Handle Heart/Initial Image specially
         if (key === 'heart') {
@@ -239,20 +239,20 @@ const QuestionScreen = ({ onYes }) => {
                         zIndex: 200
                     }}
                     transition={{ type: "spring", stiffness: 450, damping: 25 }}
-                    className="bg-red-500 hover:bg-red-600 text-white font-black py-4 md:py-5 px-10 md:px-16 border-4 md:border-6 border-black text-2xl md:text-3xl active:translate-x-1 active:translate-y-1 shadow-[8px_8px_0px_0px_#000] md:shadow-[10px_10px_0px_0px_#000] whitespace-nowrap w-48 md:w-52"
+                    className="bg-red-500 hover:bg-red-600 text-white font-black py-4 lg:py-5 px-10 lg:px-16 border-4 lg:border-6 border-black text-2xl lg:text-3xl active:translate-x-1 active:translate-y-1 shadow-[8px_8px_0px_0px_#000] lg:shadow-[10px_10px_0px_0px_#000] whitespace-nowrap w-48 lg:w-56 flex items-center justify-center leading-none"
                 >
                     NO
                 </motion.button>
             )}
 
             {/* CARD */}
-            <div className="bg-white border-[6px] md:border-[8px] border-black p-6 md:p-10 shadow-[20px_20px_0px_0px_#000] md:shadow-[30px_30px_0px_0px_#000] max-w-[95vw] md:max-w-4xl w-full text-center flex flex-col items-center justify-start relative overflow-visible min-h-[600px] md:min-h-[700px]">
+            <div className="bg-white border-[6px] lg:border-[8px] border-black p-6 lg:p-10 shadow-[20px_20px_0px_0px_#000] lg:shadow-[30px_30px_0px_0px_#000] max-w-[95vw] lg:max-w-4xl w-full text-center flex flex-col items-center justify-start relative overflow-visible min-h-[600px] lg:min-h-[700px]">
 
                 {noCount >= 15 && (
-                    <div className="absolute inset-x-0 inset-y-0 z-[500] bg-white flex flex-col items-center justify-center p-6 md:p-10">
+                    <div className="absolute inset-x-0 inset-y-0 z-[500] bg-white flex flex-col items-center justify-center p-6 lg:p-10">
                         <div className="text-center z-10 mb-20 px-8">
-                            <div className="mb-10 scale-125 md:scale-150 flex justify-center">{renderImage('threat', 'CAT')}</div>
-                            <h1 className="text-4xl md:text-8xl font-black uppercase tracking-tighter text-black">
+                            <div className="mb-10 scale-125 lg:scale-150 flex justify-center">{renderImage('threat', 'CAT')}</div>
+                            <h1 className="text-4xl lg:text-8xl font-black uppercase tracking-tighter text-black">
                                 {getDynamicText()}
                             </h1>
                         </div>
@@ -260,7 +260,7 @@ const QuestionScreen = ({ onYes }) => {
                             onClick={() => onYes()}
                             animate={{ left: `${mousePos.x}%`, top: `${mousePos.y}%`, scale: yesScale, opacity: isMouseMoving ? 0.3 : 1 }}
                             style={{ position: 'absolute', transform: 'translate(-50%, -50%)', zIndex: 1000 }}
-                            className="bg-green-500 hover:bg-green-600 text-white font-black py-6 px-20 border-6 border-black text-5xl shadow-[10px_10px_0px_0px_#000] active:translate-x-1 active:translate-y-1"
+                            className="bg-green-500 hover:bg-green-600 text-white font-black py-6 px-20 border-6 border-black text-5xl shadow-[10px_10px_0px_0px_#000] active:translate-x-1 active:translate-y-1 flex items-center justify-center"
                         >
                             YES!
                         </motion.button>
@@ -268,12 +268,12 @@ const QuestionScreen = ({ onYes }) => {
                 )}
 
                 {noCount < 15 && (
-                    <div className="w-full flex flex-col items-center pt-2 md:pt-4">
-                        <div className="min-h-[220px] md:min-h-[300px] flex items-center justify-center mb-6 md:mb-10">
+                    <div className="w-full flex flex-col items-center pt-2 lg:pt-4">
+                        <div className="min-h-[220px] lg:min-h-[300px] flex items-center justify-center mb-6 lg:mb-10">
                             {getCurrentDisplay()}
                         </div>
-                        <div className={`px-2 md:px-4 ${getCurrentDisplay() ? 'pt-6 md:pt-10' : 'pt-0'}`}>
-                            <motion.h1 key={noCount} className="font-black uppercase leading-[1.1] w-full tracking-tighter text-3xl md:text-5xl lg:text-7xl">
+                        <div className={`px-2 lg:px-4 ${getCurrentDisplay() ? 'pt-6 lg:pt-10' : 'pt-0'}`}>
+                            <motion.h1 key={noCount} className="font-black uppercase leading-[1.1] w-full tracking-tighter text-3xl lg:text-7xl">
                                 {getDynamicText()}
                             </motion.h1>
                         </div>
@@ -283,7 +283,7 @@ const QuestionScreen = ({ onYes }) => {
                 {noCount < 15 && <div className="flex-grow w-full" />}
 
                 {noCount < 15 && (
-                    <div className={`flex ${isTrickActive ? 'flex-col-reverse md:flex-row-reverse' : 'flex-col md:flex-row'} items-center justify-center gap-6 md:gap-24 relative w-full pt-8 pb-4 md:pb-10`}>
+                    <div className={`flex ${isTrickActive ? 'flex-col-reverse lg:flex-row-reverse' : 'flex-col lg:flex-row'} items-center justify-center gap-6 lg:gap-24 relative w-full pt-8 pb-4 lg:pb-10`}>
                         <motion.button
                             animate={{ opacity: 1, scale: yesScale }}
                             onHoverStart={() => { if (noCount === 2) setIsTrickActive(false); }}
@@ -295,7 +295,7 @@ const QuestionScreen = ({ onYes }) => {
                                 if (noCount === 2) { setNoCount(3); return; }
                                 onYes();
                             }}
-                            className={`bg-green-500 hover:bg-green-600 text-white font-black py-4 md:py-5 px-10 md:px-16 border-4 md:border-6 border-black text-2xl md:text-3xl relative z-10 w-48 md:w-52 transition-shadow ${yesScale <= 1 ? 'shadow-[8px_8px_0px_0px_#000] md:shadow-[10px_10px_0px_0px_#000] active:translate-x-1 active:translate-y-1' : ''}`}
+                            className={`bg-green-500 hover:bg-green-600 text-white font-black py-4 lg:py-5 px-10 lg:px-16 border-4 lg:border-6 border-black text-2xl lg:text-3xl relative z-10 w-48 lg:w-56 flex items-center justify-center leading-none transition-shadow ${yesScale <= 1 ? 'shadow-[8px_8px_0px_0px_#000] lg:shadow-[10px_10px_0px_0px_#000] active:translate-x-1 active:translate-y-1' : ''}`}
                         >
                             YES!
                         </motion.button>
@@ -308,13 +308,15 @@ const QuestionScreen = ({ onYes }) => {
                                 onTouchStart={() => { isHoveringNo.current = true; handleNoHover(); }}
                                 onTouchEnd={() => { isHoveringNo.current = false; }}
                                 onClick={handleNoClick}
-                                className="bg-red-500 hover:bg-red-600 text-white font-black py-4 md:py-5 px-10 md:px-16 border-4 md:border-6 border-black text-2xl md:text-3xl relative z-10 shadow-[8px_8px_0px_0px_#000] md:shadow-[10px_10px_0px_0px_#000] active:translate-x-1 active:translate-y-1 w-48 md:w-52"
+                                className="bg-red-500 hover:bg-red-600 text-white font-black py-4 lg:py-5 px-10 lg:px-16 border-4 lg:border-6 border-black text-2xl lg:text-3xl relative z-10 shadow-[8px_8px_0px_0px_#000] lg:shadow-[10px_10px_0px_0px_#000] active:translate-x-1 active:translate-y-1 w-48 lg:w-56 flex items-center justify-center leading-none"
                             >
                                 NO
                             </motion.button>
                         )}
                     </div>
                 )}
+
+
             </div>
         </div>
     );

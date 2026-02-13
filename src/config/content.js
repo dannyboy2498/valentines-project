@@ -25,8 +25,9 @@ export const DASHBOARD_CONTENT = {
     initialImage: import.meta.env.VITE_INITIAL_IMAGE || null, // If null, uses MailSymbol
 
     // MEMORIES CONFIG
-    // Provide a comma-separated list of image URLs in your .env file
-    memories: (import.meta.env.VITE_MEMORIES_IMAGES || "").split(",").map(str => str.trim()).filter(Boolean),
+    // Provide a list of image URLs in your .env file (supports commas or newlines)
+    memories: (import.meta.env.VITE_MEMORIES_IMAGES || "").split(/[\n,]+/).map(str => str.trim()).filter(Boolean),
+
 
     // Format: YYYY-MM-DD and HH:mm:ss
     unlockDate: import.meta.env.VITE_UNLOCK_DATE || "2026-02-14",
