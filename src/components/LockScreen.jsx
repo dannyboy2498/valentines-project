@@ -108,10 +108,15 @@ const LockScreen = ({ onUnlock }) => {
                     </motion.button>
                 </form>
 
-                {/* HINT TEXT */}
-                <p className="mt-2 text-black/60 font-bold italic uppercase text-sm tracking-wider">
-                    {DASHBOARD_CONTENT.lockHint}
-                </p>
+                <div
+                    className="mt-2 text-black/60 font-bold italic uppercase text-[12px] lg:text-sm tracking-widest whitespace-pre-line px-4 lg:px-12 leading-tight"
+                    dangerouslySetInnerHTML={{
+                        __html: DASHBOARD_CONTENT.lockHint
+                            .replace(/\n/g, '<br/>')
+                            .replace(/\*\*(.*?)\*\*/g, '<span class="text-black font-black">$1</span>')
+                            .replace(/(What am I\?)/i, '<br/><br/><span class="text-black font-black">$1</span>')
+                    }}
+                />
 
                 {/* LOCK & KEY ANIMATION AREA */}
                 <div className="mb-4 mt-8 bg-pink-100 border-[6px] border-black p-6 shadow-[10px_10px_0px_0px_#000] relative w-36 h-36 flex items-center justify-center z-0">

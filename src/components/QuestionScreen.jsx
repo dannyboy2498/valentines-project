@@ -96,10 +96,10 @@ const QuestionScreen = ({ onYes }) => {
         const isMobile = window.innerWidth < 1024;
         const effectiveGrowthCount = Math.min(noCount, 10);
         if (effectiveGrowthCount >= 3) {
-            // RELATIVE MOBILE GROWTH: 0.22 vs 0.45 
-            const multiplier = isMobile ? 0.22 : 0.45;
+            // MULTIPLIER: Restoring to a more imposing scale
+            const multiplier = isMobile ? 0.22 : 0.46;
             const stage = effectiveGrowthCount - 3;
-            setYesScale(1 + stage * multiplier);
+            setYesScale(1 + (stage * multiplier));
         } else {
             setYesScale(1);
         }
@@ -220,6 +220,16 @@ const QuestionScreen = ({ onYes }) => {
         return texts[Math.floor(noCount)] || "ACCEPT OR DIE !!!";
     };
 
+    // NUMERICAL LABEL CALCULATION: 
+    // Adapts font size based on text length to force a max 2-line wrap
+    const getResponsiveLabelStyles = (text) => {
+        if (!text) return "";
+        const len = text.length;
+        if (len > 40) return "text-xl lg:text-4xl"; // Longest strings
+        if (len > 25) return "text-2xl lg:text-5xl"; // Medium strings
+        return "text-3xl lg:text-7xl"; // Short strings
+    };
+
     return (
         <div ref={rootRef} className="h-full w-full flex items-center justify-center relative overflow-visible select-none text-black">
             {/* Running NO button */}
@@ -246,16 +256,21 @@ const QuestionScreen = ({ onYes }) => {
             )}
 
             {/* CARD */}
-            <div className="bg-white border-[6px] lg:border-[8px] border-black p-6 lg:p-10 shadow-[20px_20px_0px_0px_#000] lg:shadow-[30px_30px_0px_0px_#000] max-w-[95vw] lg:max-w-4xl w-full text-center flex flex-col items-center justify-start relative overflow-visible min-h-[600px] lg:min-h-[700px]">
+            <div className="bg-white border-[6px] lg:border-[8px] border-black pt-10 lg:pt-28 pb-10 lg:pb-16 px-6 lg:px-10 shadow-[20px_20px_0px_0px_#000] lg:shadow-[30px_30px_0px_0px_#000] max-w-[95vw] lg:max-w-4xl w-full text-center flex flex-col items-center justify-between relative overflow-visible min-h-[650px] lg:min-h-[850px]">
 
                 {noCount >= 15 && (
-                    <div className="absolute inset-x-0 inset-y-0 z-[500] bg-white flex flex-col items-center justify-center p-6 lg:p-10">
-                        <div className="text-center z-10 mb-20 px-8">
-                            <div className="mb-10 scale-125 lg:scale-150 flex justify-center">{renderImage('threat', 'CAT')}</div>
-                            <h1 className="text-4xl lg:text-8xl font-black uppercase tracking-tighter text-black">
-                                {getDynamicText()}
-                            </h1>
+                    <div className="absolute inset-0 z-[500] bg-white flex flex-col items-center justify-between py-12 lg:py-20 px-6 lg:p-10">
+                        <div className="w-full flex flex-col items-center">
+                            <div className="mb-2 lg:mb-6 scale-110 lg:scale-125">
+                                {renderImage('threat', 'CAT')}
+                            </div>
+                            <div className="px-2 lg:px-4 w-full flex items-center justify-center min-h-[80px] lg:min-h-[160px]">
+                                <h1 className={`font-black uppercase tracking-tighter text-black leading-[1.1] max-w-[340px] lg:max-w-3xl mx-auto ${getResponsiveLabelStyles(getDynamicText())}`}>
+                                    {getDynamicText()}
+                                </h1>
+                            </div>
                         </div>
+
                         <motion.button
                             onClick={() => onYes()}
                             animate={{ left: `${mousePos.x}%`, top: `${mousePos.y}%`, scale: yesScale, opacity: isMouseMoving ? 0.3 : 1 }}
@@ -268,16 +283,22 @@ const QuestionScreen = ({ onYes }) => {
                 )}
 
                 {noCount < 15 && (
-                    <div className="w-full flex flex-col items-center pt-2 lg:pt-4">
-                        <div className="min-h-[220px] lg:min-h-[300px] flex items-center justify-center mb-6 lg:mb-10">
+                    <motion.div
+                        animate={{ y: noCount >= 8 ? -Math.min(100, (noCount - 7) * 20 + 20) : -15 }}
+                        className="w-full flex flex-col items-center pt-0"
+                    >
+                        <div className="min-h-[220px] lg:min-h-[280px] flex items-center justify-center mb-2 lg:mb-4">
                             {getCurrentDisplay()}
                         </div>
-                        <div className={`px-2 lg:px-4 ${getCurrentDisplay() ? 'pt-6 lg:pt-10' : 'pt-0'}`}>
-                            <motion.h1 key={noCount} className="font-black uppercase leading-[1.1] w-full tracking-tighter text-3xl lg:text-7xl">
+                        <div className={`px-2 lg:px-4 w-full flex items-center justify-center min-h-[80px] lg:min-h-[160px] ${getCurrentDisplay() ? 'mt-1 lg:mt-2' : 'mt-0'}`}>
+                            <motion.h1
+                                key={noCount}
+                                className={`font-black uppercase leading-[1.1] w-full tracking-tighter max-w-[340px] lg:max-w-3xl mx-auto ${getResponsiveLabelStyles(getDynamicText())}`}
+                            >
                                 {getDynamicText()}
                             </motion.h1>
                         </div>
-                    </div>
+                    </motion.div>
                 )}
 
                 {noCount < 15 && <div className="flex-grow w-full" />}
@@ -295,7 +316,7 @@ const QuestionScreen = ({ onYes }) => {
                                 if (noCount === 2) { setNoCount(3); return; }
                                 onYes();
                             }}
-                            className={`bg-green-500 hover:bg-green-600 text-white font-black py-4 lg:py-5 px-10 lg:px-16 border-4 lg:border-6 border-black text-2xl lg:text-3xl relative z-10 w-48 lg:w-56 flex items-center justify-center leading-none transition-shadow ${yesScale <= 1 ? 'shadow-[8px_8px_0px_0px_#000] lg:shadow-[10px_10px_0px_0px_#000] active:translate-x-1 active:translate-y-1' : ''}`}
+                            className={`bg-green-500 hover:bg-green-600 hover:opacity-90 text-white font-black py-4 lg:py-5 px-10 lg:px-16 border-4 lg:border-6 border-black text-2xl lg:text-3xl relative z-10 w-48 lg:w-56 flex items-center justify-center leading-none transition-all ${yesScale <= 1 ? 'shadow-[8px_8px_0px_0px_#000] lg:shadow-[10px_10px_0px_0px_#000] active:translate-x-1 active:translate-y-1' : ''}`}
                         >
                             YES!
                         </motion.button>
@@ -308,7 +329,7 @@ const QuestionScreen = ({ onYes }) => {
                                 onTouchStart={() => { isHoveringNo.current = true; handleNoHover(); }}
                                 onTouchEnd={() => { isHoveringNo.current = false; }}
                                 onClick={handleNoClick}
-                                className="bg-red-500 hover:bg-red-600 text-white font-black py-4 lg:py-5 px-10 lg:px-16 border-4 lg:border-6 border-black text-2xl lg:text-3xl relative z-10 shadow-[8px_8px_0px_0px_#000] lg:shadow-[10px_10px_0px_0px_#000] active:translate-x-1 active:translate-y-1 w-48 lg:w-56 flex items-center justify-center leading-none"
+                                className="bg-red-500 hover:bg-red-600 hover:opacity-90 text-white font-black py-4 lg:py-5 px-10 lg:px-16 border-4 lg:border-6 border-black text-2xl lg:text-3xl relative z-10 shadow-[8px_8px_0px_0px_#000] lg:shadow-[10px_10px_0px_0px_#000] active:translate-x-1 active:translate-y-1 w-48 lg:w-56 flex items-center justify-center leading-none transition-all"
                             >
                                 NO
                             </motion.button>
