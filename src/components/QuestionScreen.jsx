@@ -182,7 +182,7 @@ const QuestionScreen = ({ onYes }) => {
     const handleImageError = (key) => setImageErrors(prev => ({ ...prev, [key]: true }));
 
     const renderImage = (key, label) => {
-        const cls = "w-[200px] h-[200px] lg:w-[280px] lg:h-[280px] object-cover border-4 border-black shadow-[8px_8px_0px_0px_#000]";
+        const cls = "w-[240px] h-[240px] lg:w-[280px] lg:h-[280px] object-cover border-4 border-black shadow-[8px_8px_0px_0px_#000]";
 
         // Handle Heart/Initial Image specially
         if (key === 'heart') {
@@ -256,15 +256,15 @@ const QuestionScreen = ({ onYes }) => {
             )}
 
             {/* CARD */}
-            <div className="bg-white border-[6px] lg:border-[8px] border-black pt-10 lg:pt-28 pb-10 lg:pb-16 px-6 lg:px-10 shadow-[20px_20px_0px_0px_#000] lg:shadow-[30px_30px_0px_0px_#000] max-w-[95vw] lg:max-w-4xl w-full text-center flex flex-col items-center justify-between relative overflow-visible min-h-[650px] lg:min-h-[850px]">
+            <div className="bg-white border-[6px] lg:border-[8px] border-black pt-8 lg:pt-28 pb-6 lg:pb-16 px-6 lg:px-10 shadow-[20px_20px_0px_0px_#000] lg:shadow-[30px_30px_0px_0px_#000] max-w-[95vw] lg:max-w-4xl w-full text-center flex flex-col items-center justify-between relative overflow-visible min-h-[650px] lg:min-h-[850px]">
 
                 {noCount >= 15 && (
                     <div className="absolute inset-0 z-[500] bg-white flex flex-col items-center justify-between py-12 lg:py-20 px-6 lg:p-10">
                         <div className="w-full flex flex-col items-center">
-                            <div className="mb-2 lg:mb-6 scale-110 lg:scale-125">
+                            <div className="mb-6 lg:mb-6 scale-110 lg:scale-125">
                                 {renderImage('threat', 'CAT')}
                             </div>
-                            <div className="px-2 lg:px-4 w-full flex items-center justify-center min-h-[80px] lg:min-h-[160px]">
+                            <div className="px-2 lg:px-4 w-full flex items-center justify-center min-h-[100px] lg:min-h-[160px]">
                                 <h1 className={`font-black uppercase tracking-tighter text-black leading-[1.1] max-w-[340px] lg:max-w-3xl mx-auto ${getResponsiveLabelStyles(getDynamicText())}`}>
                                     {getDynamicText()}
                                 </h1>
@@ -284,13 +284,17 @@ const QuestionScreen = ({ onYes }) => {
 
                 {noCount < 15 && (
                     <motion.div
-                        animate={{ y: noCount >= 8 ? -Math.min(100, (noCount - 7) * 20 + 20) : -15 }}
+                        animate={{
+                            y: window.innerWidth < 1024
+                                ? (noCount >= 10 ? -20 : 0)
+                                : (noCount >= 8 ? -Math.min(100, (noCount - 7) * 20 + 20) : -15)
+                        }}
                         className="w-full flex flex-col items-center pt-0"
                     >
-                        <div className="min-h-[220px] lg:min-h-[280px] flex items-center justify-center mb-2 lg:mb-4">
+                        <div className="min-h-[260px] lg:min-h-[280px] flex items-center justify-center mb-6 lg:mb-6">
                             {getCurrentDisplay()}
                         </div>
-                        <div className={`px-2 lg:px-4 w-full flex items-center justify-center min-h-[80px] lg:min-h-[160px] ${getCurrentDisplay() ? 'mt-1 lg:mt-2' : 'mt-0'}`}>
+                        <div className="px-2 lg:px-4 w-full flex items-center justify-center min-h-[100px] lg:min-h-[160px]">
                             <motion.h1
                                 key={noCount}
                                 className={`font-black uppercase leading-[1.1] w-full tracking-tighter max-w-[340px] lg:max-w-3xl mx-auto ${getResponsiveLabelStyles(getDynamicText())}`}
@@ -304,7 +308,7 @@ const QuestionScreen = ({ onYes }) => {
                 {noCount < 15 && <div className="flex-grow w-full" />}
 
                 {noCount < 15 && (
-                    <div className={`flex ${isTrickActive ? 'flex-col-reverse lg:flex-row-reverse' : 'flex-col lg:flex-row'} items-center justify-center gap-6 lg:gap-24 relative w-full pt-8 pb-4 lg:pb-10`}>
+                    <div className={`flex ${isTrickActive ? 'flex-col-reverse lg:flex-row-reverse' : 'flex-col lg:flex-row'} items-center justify-center gap-6 lg:gap-24 relative w-full pt-6 pb-2 lg:pb-10`}>
                         <motion.button
                             animate={{ opacity: 1, scale: yesScale }}
                             onHoverStart={() => { if (noCount === 2) setIsTrickActive(false); }}
