@@ -29,8 +29,14 @@ All personal content can be managed via the `.env` file without touching the cod
 - **Secret Code:** Set `VITE_LOCK_CODE` (any length) and a matching `VITE_LOCK_HINT`.
 - **Countdown:** Set `VITE_UNLOCK_DATE` (YYYY-MM-DD) to ensure it opens exactly when you want.
 - **Memories:** Add image URLs or local paths to `VITE_MEMORIES_IMAGES`.
-- **Local Images:** Best practice is to drop images directly into the `/public` root folder and reference them as `/your-image.jpg` in the `.env` file.
 - **Messages:** Update the titles and personal notes in the Dashboard.
+- **Custom Domain:** If deploying to GitHub Pages with a custom domain, set `VITE_CNAME` in your `.env`.
+
+### Adding Your Own Images
+The most reliable way to add photos is to drop them directly into the `/public` folder.
+1. Place a photo named `cover.jpg` in `/public`.
+2. Reference it in your `.env` as `VITE_INITIAL_IMAGE="/cover.jpg"`.
+3. Do the same for your gallery in `VITE_MEMORIES_IMAGES`.
 
 ## Packaging for Release
 
@@ -41,16 +47,14 @@ When sharing this project, you should:
 
 ## Giving a Preview (Without Spoilers)
 
-1. **Screenshot the Lock Screen:** It looks great but keeps the contents a secret.
-2. **Debug Mode:** You can bypass the countdown by adding `?debug=true` to the URL.
-3. **Social Preview:** The project is set up with a clean aesthetic that works well for social sharing!
+**Debug Mode:** You can bypass the countdown by adding `?debug=true` to the URL.
 
 ## Tech Stack
-- React + Vite
-- Tailwind CSS
-- Framer Motion (Animations)
-- Lucide React (Icons)
-- Canvas Confetti
+- **Framework:** React + Vite
+- **Animations:** Framer Motion
+- **Styling:** Tailwind CSS (Vanilla CSS aesthetics)
+- **Icons:** Lucide React
+- **Effects:** Canvas Confetti
 
 ---
 *Created with ❤️ for Valentine's Day*
