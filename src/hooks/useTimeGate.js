@@ -8,6 +8,7 @@ const useTimeGate = () => {
 
   const { unlockDate, unlockTime, timezone } = DASHBOARD_CONTENT;
 
+  // 1. Sync with Server once to get the "Absolute Truth" offset
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('debug') === 'true') {
@@ -17,95 +18,69 @@ const useTimeGate = () => {
 
     const syncWithServer = async () => {
       try {
-        // Use the configured timezone for server sync
         const response = await fetch(`https://worldtimeapi.org/api/timezone/${timezone}`, {
           cache: 'no-store'
         });
         const data = await response.json();
 
-        const serverTime = new Date(data.datetime);
-        const localTime = new Date();
+        // This is the server's UTC time
+        const serverUTC = new Date(data.utc_datetime).getTime();
+        const localUTC = new Date().getTime();
 
-        setServerOffset(serverTime.getTime() - localTime.getTime());
+        // If local is 12:00 and server is 12:00, offset is 0.
+        // This accounts for any system clock drift on her computer.
+        setServerOffset(serverUTC - localUTC);
       } catch (error) {
-        console.warn(`Failed to fetch ${timezone} server time, falling back to local clock.`, error);
+        console.warn("Server sync failed, using local clock as fallback.");
       }
     };
 
     syncWithServer();
   }, [timezone]);
 
+  // 2. Calculate the target time in UTC based on the desired Timezone
   useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('debug') === 'true') {
-      setIsLocked(false);
-      return;
-    }
-
-    // Construct the target date
-    // We want to calculate the target time in the specific timezone.
-    // A robust way without heavy libraries is to use the server offset we calculated.
-    // We need to know what the target time is in UTC.
-
     const updateCountdown = async () => {
+      let utcTarget;
+
       try {
-        // To get the target UTC time for a specific date/time in a specific timezone:
-        // We can use the worldtimeapi 'datetime' we already fetched to infer the offset of the target timezone.
-        // But simpler: just use the local time + serverOffset to get "current time in source timezone" 
-        // and compare it to the target date/time string.
-
-        // This is tricky without a library. 
-        // Let's assume the user provided something like "2026-02-14T00:00:00" 
-        // and we want that to be in the target timezone.
-
-        // Let's fetch the target timezone's info again if we don't have it to get its UTC offset.
+        // We need to know the offset of the target timezone (e.g., -5 for Ecuador)
         const response = await fetch(`https://worldtimeapi.org/api/timezone/${timezone}`);
         const data = await response.json();
-        const utcOffsetSeconds = data.raw_offset + (data.dst ? data.dst_offset : 0);
+        const offsetSeconds = data.raw_offset + (data.dst ? data.dst_offset : 0);
 
-        // Target time in UTC is: targetLocalTime - utcOffset
-        const targetDate = new Date(`${unlockDate}T${unlockTime}Z`);
-        const targetUTC = targetDate.getTime() - (utcOffsetSeconds * 1000);
-
-        const internalUpdate = () => {
-          const adjustedNow = new Date().getTime() + serverOffset;
-          const diff = targetUTC - adjustedNow;
-
-          if (diff <= 0) {
-            setIsLocked(false);
-            setTimeRemaining(0);
-          } else {
-            setIsLocked(true);
-            setTimeRemaining(diff);
-          }
-        };
-
-        internalUpdate();
-        const timer = setInterval(internalUpdate, 1000);
-        return () => clearInterval(timer);
+        // Target: Midnight in Ecuador (-5) 
+        // Logic: (Target Local Time) - (Ecuador Offset) = UTC Target
+        // 00:00:00 - (-5) = 05:00:00 UTC
+        const localTarget = new Date(`${unlockDate}T${unlockTime}Z`).getTime();
+        utcTarget = localTarget - (offsetSeconds * 1000);
       } catch (e) {
-        // Fallback: Just use local time if API fails
-        const targetUTC = new Date(`${unlockDate}T${unlockTime}`).getTime();
-        const internalUpdate = () => {
-          const diff = targetUTC - new Date().getTime();
-          if (diff <= 0) {
-            setIsLocked(false);
-            setTimeRemaining(0);
-          } else {
-            setIsLocked(true);
-            setTimeRemaining(diff);
-          }
-        };
-        internalUpdate();
-        const timer = setInterval(internalUpdate, 1000);
-        return () => clearInterval(timer);
+        // Fallback: If API fails, default to a -5 offset (Ecuador) if that's what's configured
+        const isEcuador = timezone.includes('Guayaquil');
+        const fallbackOffset = isEcuador ? -5 * 3600 : 0;
+        const localTarget = new Date(`${unlockDate}T${unlockTime}Z`).getTime();
+        utcTarget = localTarget - (fallbackOffset * 1000);
       }
+
+      const timer = setInterval(() => {
+        const nowUTC = new Date().getTime() + serverOffset;
+        const diff = utcTarget - nowUTC;
+
+        if (diff <= 0) {
+          setIsLocked(false);
+          setTimeRemaining(0);
+          clearInterval(timer);
+        } else {
+          setIsLocked(true);
+          setTimeRemaining(diff);
+        }
+      }, 1000);
+
+      return () => clearInterval(timer);
     };
 
     const cleanupPromise = updateCountdown();
-    return () => {
-      cleanupPromise.then(cleanup => cleanup && cleanup());
-    };
+    return () => { cleanupPromise.then(cleanup => cleanup && cleanup()); };
   }, [serverOffset, unlockDate, unlockTime, timezone]);
 
   return { isLocked, timeRemaining };

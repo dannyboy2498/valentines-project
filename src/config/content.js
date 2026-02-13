@@ -21,5 +21,5 @@ export const DASHBOARD_CONTENT = {
     // Format: YYYY-MM-DD and HH:mm:ss
     unlockDate: import.meta.env.VITE_UNLOCK_DATE || "2026-02-14",
     unlockTime: import.meta.env.VITE_UNLOCK_TIME || "00:00:00",
-    timezone: import.meta.env.VITE_TIMEZONE || "UTC", // e.g., "America/New_York", "Europe/London", "UTC"
+    timezone: import.meta.env.VITE_TIMEZONE || "America/Guayaquil", // e.g., "America/Guayaquil", "Europe/London", "UTC"
 };
