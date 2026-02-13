@@ -15,7 +15,6 @@ const AppScaler = ({ children }) => {
       const isMobile = window.innerWidth < 1024;
 
       // We define a "Safe Stage" that we want to preserve.
-      // If the window is smaller than this stage, we scale the stage down.
       const idealWidth = isMobile ? 480 : 1300;
       const idealHeight = isMobile ? 850 : 920;
 
@@ -25,7 +24,8 @@ const AppScaler = ({ children }) => {
       // The final scale is the most restrictive one, capped at 1.
       const finalScale = Math.min(vScale, hScale, 1);
 
-      setScale(Math.max(finalScale, 0.35));
+      // Reverted to 0.25 (or lower) for mobile to ensure it never overflows
+      setScale(Math.max(finalScale, 0.25));
       setStageSize({ width: idealWidth, height: idealHeight });
     };
 
@@ -36,12 +36,6 @@ const AppScaler = ({ children }) => {
 
   return (
     <div className="fixed inset-0 w-full h-full bg-[#fce7f3] overflow-hidden flex items-center justify-center">
-      {/* 
-          The Stage: 
-          This is a fixed-size container that represents our "Design Surface".
-          We scale this entire surface to fit the window.
-          overflow-visible is CRITICAL so shadows and badges can bleed out.
-      */}
       <div
         className="flex items-center justify-center transition-transform duration-150 ease-out will-change-transform overflow-visible"
         style={{
@@ -70,7 +64,6 @@ function App() {
   const [gameState, setGameState] = useState('asking');
   const [isCodeUnlocked, setIsCodeUnlocked] = useState(false);
 
-  // View state mapping
   let content;
   if (!isTimeGateOpen) {
     content = <CountdownScreen timeRemaining={timeRemaining} />;
