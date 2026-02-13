@@ -9,7 +9,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "stage": "npm run build && npm run preview",
-    "predeploy": "npm run build",
+    "predeploy": "npm run build && node scripts/generate-cname.js",
     "deploy": "gh-pages -d dist"
   },
   "dependencies": {
