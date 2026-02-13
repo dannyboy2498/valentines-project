@@ -47,7 +47,7 @@ const LockScreen = ({ onUnlock }) => {
     };
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen w-screen px-4 bg-transparent relative select-none overflow-hidden text-black">
+        <div className="flex flex-col items-center justify-center min-h-screen w-screen px-4 bg-transparent relative select-none overflow-visible text-black">
             <motion.div
                 initial={{ y: 20, opacity: 0 }}
                 animate={{

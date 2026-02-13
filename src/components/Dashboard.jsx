@@ -107,7 +107,7 @@ const Dashboard = ({ showFireworks = true }) => {
     };
 
     return (
-        <div className="min-h-screen pt-12 md:pt-20 pb-32 px-4 flex flex-col items-center justify-start bg-pink-50 overflow-x-hidden relative">
+        <div className="min-h-full w-full pt-12 md:pt-20 pb-32 px-4 flex flex-col items-center justify-start bg-transparent overflow-visible relative">
             <HeartParticles zIndex={0} />
             {showFireworks && <FireworksOverlay />}
 
@@ -288,8 +288,8 @@ const Dashboard = ({ showFireworks = true }) => {
                 </AnimatePresence>
             </div>
 
-            {/* GLOBAL NAVIGATION BAR */}
-            <div className="fixed bottom-6 md:bottom-8 left-0 w-full flex justify-center z-50 pointer-events-none px-4">
+            {/* GLOBAL NAVIGATION BAR - Now Absolute to scale with AppScaler */}
+            <div className="absolute bottom-6 md:bottom-8 left-0 w-full flex justify-center z-50 pointer-events-none px-4">
                 <motion.div
                     layout
                     className="flex items-center gap-3 md:gap-4 pointer-events-auto bg-white/95 backdrop-blur-sm border-[3px] md:border-4 border-black p-2 md:p-3 shadow-[6px_6px_0px_0px_#000] md:shadow-[8px_8px_0px_0px_#000]"
