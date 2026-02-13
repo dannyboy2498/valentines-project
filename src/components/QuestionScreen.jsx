@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AlertCircle } from 'lucide-react';
 import MailSymbol from './MailSymbol';
 import { IMAGE_ASSETS } from '../config/assets';
 
 const MissingImage = ({ label }) => (
-    <div className="w-[300px] h-[300px] bg-gray-200 border-4 border-dashed border-gray-400 flex flex-col items-center justify-center text-gray-500 font-black uppercase text-sm p-4 text-center italic">
+    <div className="w-[180px] h-[180px] md:w-[300px] md:h-[300px] bg-gray-200 border-4 border-dashed border-gray-400 flex flex-col items-center justify-center text-gray-500 font-black uppercase text-xs md:text-sm p-4 text-center italic">
         <AlertCircle size={32} className="mb-2" />
         <span>Missing {label}</span>
         <span className="text-[10px] mt-2 normal-case font-normal">(Drop in /public/images/)</span>
@@ -18,6 +18,25 @@ const QuestionScreen = ({ onYes }) => {
     const [isVanish, setIsVanish] = useState(false);
     const [yesScale, setYesScale] = useState(1);
     const [hasStartedRunning, setHasStartedRunning] = useState(false);
+    const [windowSize, setWindowSize] = useState({
+        width: typeof window !== 'undefined' ? window.innerWidth : 1200,
+        height: typeof window !== 'undefined' ? window.innerHeight : 800
+    });
+
+    const isMobile = windowSize.width < 640;
+
+    // Use a scale factor based on BOTH width and height to ensure content fits the "Safe Zone"
+    const contentScale = useMemo(() => {
+        const baseWidth = isMobile ? 375 : 1200;
+        const baseHeight = isMobile ? 667 : 800;
+
+        const widthRatio = windowSize.width / baseWidth;
+        const heightRatio = windowSize.height / baseHeight;
+
+        // Take the more restrictive ratio to ensure we fit in both directions
+        const scale = Math.min(widthRatio, heightRatio, 1);
+        return isMobile ? Math.max(scale, 0.85) : 1;
+    }, [windowSize, isMobile]);
 
     // Trick logic for Stage 2 ("Are you sure you're sure?")
     const [isTrickActive, setIsTrickActive] = useState(false);
@@ -30,10 +49,18 @@ const QuestionScreen = ({ onYes }) => {
     const noBtnRef = useRef(null);
     const [isInteractionBlocked, setIsInteractionBlocked] = useState(false);
 
+    useEffect(() => {
+        const handleResize = () => {
+            setWindowSize({ width: window.innerWidth, height: window.innerHeight });
+        };
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
     // Block interaction briefly when the question changes
     useEffect(() => {
         setIsInteractionBlocked(true);
-        const timer = setTimeout(() => setIsInteractionBlocked(false), 500); // 500ms safety buffer
+        const timer = setTimeout(() => setIsInteractionBlocked(false), 500);
         return () => clearTimeout(timer);
     }, [noCount]);
 
@@ -48,7 +75,6 @@ const QuestionScreen = ({ onYes }) => {
 
     // Auto-progression logic for the "Endgame" stages
     useEffect(() => {
-        // Stages 10-14 are the silence sequence
         if (noCount >= 10 && noCount < 15) {
             const waitTime = noCount === 10 ? 8000 : 5000;
             const timer = setTimeout(() => setNoCount(prev => prev + 1), waitTime);
@@ -56,10 +82,11 @@ const QuestionScreen = ({ onYes }) => {
         }
     }, [noCount]);
 
-    // Mouse tracking for the "Accept or Else" chase
     useEffect(() => {
-        const handleMouseMove = (e) => {
-            setMousePos({ x: e.clientX, y: e.clientY });
+        const handleMove = (e) => {
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            setMousePos({ x: clientX, y: clientY });
             setIsMouseMoving(true);
 
             if (mouseMoveTimeout.current) clearTimeout(mouseMoveTimeout.current);
@@ -68,46 +95,48 @@ const QuestionScreen = ({ onYes }) => {
             }, 100);
         };
 
-        window.addEventListener('mousemove', handleMouseMove);
+        window.addEventListener('mousemove', handleMove);
+        window.addEventListener('touchmove', handleMove, { passive: true });
         return () => {
-            window.removeEventListener('mousemove', handleMouseMove);
+            window.removeEventListener('mousemove', handleMove);
+            window.removeEventListener('touchmove', handleMove);
             if (mouseMoveTimeout.current) clearTimeout(mouseMoveTimeout.current);
         };
     }, []);
 
     useEffect(() => {
-        // Growth starts after the intro loop (noCount >= 3)
         if (noCount >= 3) {
             const growthStage = noCount - 3;
-            setYesScale(1 + Math.min(growthStage, 7) * 0.35);
+            // Slightly reduced growth factor for mobile to prevent overlap
+            const growthFactor = isMobile ? 0.25 : 0.35;
+            setYesScale(1 + Math.min(growthStage, 7) * growthFactor);
         } else {
             setYesScale(1);
         }
-    }, [noCount]);
+    }, [noCount, isMobile]);
 
-    const handleNoClick = () => {
+    const handleNoClick = (e) => {
         if (isInteractionBlocked) return;
+        if (e && e.stopPropagation) e.stopPropagation();
+
         if (noCount === 0) {
             setNoCount(1);
             return;
         }
-        // Clicking NO in "Are you sure?" stages takes you back home
+
         if (noCount === 1 || noCount === 2) {
             setNoCount(0);
-            setHasTrickDone(false); // Reset trick for next time
+            setHasTrickDone(false);
             return;
         }
 
-        // If we are at stage 3 or higher, the NO button starts jumping
         handleNoHover();
     };
 
     const handleNoHover = () => {
         if (isInteractionBlocked) return;
-        // Growth/Jumping only happens from stage 3 onwards
         if (noCount < 3) return;
 
-        // The 10th total hit makes it vanish (7 hits after stage 3)
         if (noCount >= 9) {
             setIsVanish(true);
             setNoCount(10);
@@ -118,10 +147,10 @@ const QuestionScreen = ({ onYes }) => {
 
         const winW = window.innerWidth;
         const winH = window.innerHeight;
-        const btnW = 200;
-        const btnH = 80;
-        const safePadding = 50;
-        const minDistance = 300;
+        const btnW = 160;
+        const btnH = 60;
+        const safePadding = 40;
+        const minDistance = winW < 640 ? 150 : 300;
 
         let targetAbsX, targetAbsY;
         let distance = 0;
@@ -131,6 +160,7 @@ const QuestionScreen = ({ onYes }) => {
             targetAbsX = safePadding + Math.random() * (winW - btnW - safePadding * 2);
             targetAbsY = safePadding + Math.random() * (winH - btnH - safePadding * 2);
 
+            // Calculate current absolute position correctly
             const cardCenterW = winW / 2;
             const cardCenterH = winH / 2;
             const currentAbsX = position.x + (cardCenterW - btnW / 2);
@@ -152,25 +182,25 @@ const QuestionScreen = ({ onYes }) => {
     };
 
     const handleYesHover = () => {
-        // The Trick: If we are in Stage 2 and they hover YES, swap back
         if (noCount === 2 && isTrickActive) {
             setIsTrickActive(false);
             setHasTrickDone(true);
         }
     };
 
-    const handleYesClick = () => {
-        // Intro progressions
+    const handleYesClick = (e) => {
+        if (isInteractionBlocked) return;
+        if (e && e.stopPropagation) e.stopPropagation();
+
         if (noCount === 1) {
-            setNoCount(2); // "Are you sure?" -> "Are you sure you're sure?"
+            setNoCount(2);
             return;
         }
         if (noCount === 2) {
-            setNoCount(3); // "Are you sure you're sure?" -> "why not?" (Growth starts)
+            setNoCount(3);
             return;
         }
 
-        // Real successful accept
         onYes();
     };
 
@@ -182,7 +212,7 @@ const QuestionScreen = ({ onYes }) => {
         if (imageErrors[key]) return <MissingImage label={label} />;
         return (
             <img src={IMAGE_ASSETS[key]} alt={label}
-                className="w-[280px] h-[280px] object-cover border-4 border-black shadow-[8px_8px_0px_0px_#000]"
+                className="w-[180px] h-[180px] md:w-[280px] md:h-[280px] object-cover border-4 border-black shadow-[8px_8px_0px_0px_#000]"
                 onError={() => handleImageError(key)} />
         );
     };
@@ -224,48 +254,47 @@ const QuestionScreen = ({ onYes }) => {
 
     const dynamicFontSize = () => {
         const text = getDynamicText();
-        const baseSize = 3.5;
+        const baseSize = isMobile ? 1.8 : 3.5;
         const length = text.length;
-        if (length <= 20) return `${baseSize}rem`;
+        if (length <= 20) return `${baseSize * contentScale}rem`;
         const scaledSize = (baseSize * 22) / length;
-        return `${Math.max(1.5, Math.min(baseSize, scaledSize))}rem`;
+        return `${Math.max(isMobile ? 1.2 : 1.5, Math.min(baseSize, scaledSize)) * contentScale}rem`;
     };
 
-    // Determine if buttons should be swapped (Trick Stage 2)
     const isSwapped = isTrickActive;
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen w-screen px-4 bg-transparent relative select-none overflow-hidden text-black">
-            <div className="bg-white border-[8px] border-black p-8 shadow-[25px_25px_0px_0px_#000] max-w-4xl max-h-[90vh] w-full text-center flex flex-col items-center justify-between relative overflow-hidden">
+        <div className="flex flex-col items-center justify-center min-h-screen w-screen px-4 bg-transparent relative select-none overflow-hidden text-black transition-all duration-300" style={{ transform: `scale(${isMobile ? 1 : contentScale})` }}>
+            <div className="bg-white border-[6px] md:border-[8px] border-black p-6 md:p-8 shadow-[15px_15px_0px_0px_#000] md:shadow-[25px_25px_0px_0px_#000] max-w-[95vw] md:max-w-4xl min-h-[500px] md:min-h-[auto] max-h-[92vh] w-full text-center flex flex-col items-center justify-between relative overflow-hidden">
 
-                <div className="w-full flex flex-col items-center pointer-events-none min-h-[420px]">
-                    <div className="h-[300px] flex items-center justify-center mb-0 text-center px-10">
+                {/* Content Section: Always takes available space but pushes buttons down */}
+                <div className="w-full flex flex-col items-center pointer-events-none flex-grow justify-start pt-2">
+                    {/* Image Area: Controlled height to ensure room for text/buttons */}
+                    <div className="h-[200px] md:h-[300px] flex items-center justify-center mb-4 md:mb-6 text-center px-4 md:px-10">
                         {getCurrentDisplay() && (
-                            <div className="inline-block overflow-visible">
+                            <div className="inline-block overflow-visible scale-90 md:scale-100">
                                 {getCurrentDisplay()}
                             </div>
                         )}
                     </div>
 
-                    <div className="h-[120px] flex items-start justify-center relative z-10 w-full px-4 pt-4">
+                    {/* Text Area: Flexible but separated */}
+                    <div className="min-h-[80px] md:min-h-[120px] flex items-center justify-center text-center relative z-10 w-full px-2 md:px-4 mb-4">
                         <motion.h1
                             key={noCount}
                             initial={false}
-                            animate={{
-                                y: getCurrentDisplay() ? 0 : -160,
-                            }}
+                            animate={{ y: 0 }}
                             transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                            style={{
-                                fontSize: dynamicFontSize(),
-                            }}
-                            className={`font-black uppercase leading-tight w-full tracking-tighter transition-all duration-300 ${!getCurrentDisplay() ? 'whitespace-normal' : 'whitespace-nowrap'}`}
+                            style={{ fontSize: dynamicFontSize() }}
+                            className="font-black uppercase leading-[1.1] w-full tracking-tighter transition-all duration-300 whitespace-normal"
                         >
                             {getDynamicText()}
                         </motion.h1>
                     </div>
                 </div>
 
-                <div className={`flex flex-col ${isSwapped ? 'md:flex-row-reverse' : 'md:flex-row'} items-center justify-center gap-24 relative w-full h-[250px] pb-6`}>
+                {/* Button Section: Fixed-ish area with clear separation */}
+                <div className={`flex ${isSwapped ? 'flex-col-reverse md:flex-row-reverse' : 'flex-col md:flex-row'} items-center justify-center gap-4 md:gap-24 relative w-full pt-4 pb-4 md:pb-6 min-h-[180px] md:min-h-[200px]`}>
                     <div className="flex items-center justify-center">
                         <AnimatePresence>
                             {!(noCount === 13 || noCount === 14) && (
@@ -275,10 +304,12 @@ const QuestionScreen = ({ onYes }) => {
                                             initial={{ opacity: 0, scale: 0.8 }}
                                             animate={{ opacity: 1, scale: yesScale }}
                                             onHoverStart={handleYesHover}
+                                            onTouchStart={handleYesHover}
+                                            whileTap={{ scale: 0.9, x: 2, y: 2 }}
                                             exit={{ opacity: 0, scale: 0.8 }}
                                             onClick={handleYesClick}
                                             transition={{ type: "spring", stiffness: 300, damping: 15 }}
-                                            className={`bg-green-500 hover:bg-green-600 text-white font-black py-5 px-16 border-6 border-black text-3xl active:translate-x-1 active:translate-y-1 active:shadow-none z-10 whitespace-nowrap transition-shadow w-52 ${noCount <= 3 ? 'shadow-[10px_10px_0px_0px_#000]' : 'shadow-none'}`}
+                                            className={`bg-green-500 hover:bg-green-600 text-white font-black py-4 md:py-5 px-10 md:px-16 border-4 md:border-6 border-black text-xl md:text-3xl active:translate-x-1 active:translate-y-1 z-10 whitespace-nowrap transition-shadow w-44 md:w-52 ${noCount <= 3 ? 'shadow-[8px_8px_0px_0px_#000] md:shadow-[10px_10px_0px_0px_#000]' : 'shadow-none'}`}
                                         >
                                             YES!
                                         </motion.button>
@@ -303,7 +334,7 @@ const QuestionScreen = ({ onYes }) => {
                                                 y: { type: "spring", stiffness: 600, damping: 35, mass: 0.2 },
                                                 opacity: { duration: 0.4, ease: "easeInOut" }
                                             }}
-                                            className="fixed bg-green-500 hover:bg-green-600 text-white font-black py-5 px-16 border-6 border-black text-4xl shadow-[10px_10px_0px_0px_#000] z-[200] whitespace-nowrap w-64"
+                                            className="fixed bg-green-500 hover:bg-green-600 text-white font-black py-4 md:py-5 px-10 md:px-16 border-4 md:border-6 border-black text-3xl md:text-4xl shadow-[8px_8px_0px_0px_#000] md:shadow-[10px_10px_0px_0px_#000] z-[200] whitespace-nowrap w-52 md:w-64"
                                         >
                                             YES!
                                         </motion.button>
@@ -318,11 +349,13 @@ const QuestionScreen = ({ onYes }) => {
                             <motion.button
                                 ref={noBtnRef}
                                 onHoverStart={handleNoHover}
+                                onTouchStart={handleNoHover}
+                                whileTap={{ scale: 0.9, x: 2, y: 2 }}
                                 onClick={handleNoClick}
                                 animate={position}
                                 exit={{ opacity: 0, scale: 0, rotate: 180 }}
                                 transition={{ type: "spring", stiffness: 450, damping: 25 }}
-                                className={`bg-red-500 hover:bg-red-600 text-white font-black py-5 px-16 border-6 border-black text-3xl ${noCount <= 3 ? 'shadow-[10px_10px_0px_0px_#000]' : 'shadow-none'} ${hasStartedRunning ? 'fixed z-[100]' : 'relative md:static z-[60]'} whitespace-nowrap w-52 pointer-events-auto`}
+                                className={`bg-red-500 hover:bg-red-600 text-white font-black py-4 md:py-5 px-10 md:px-16 border-4 md:border-6 border-black text-xl md:text-3xl ${noCount <= 3 ? 'shadow-[8px_8px_0px_0px_#000] md:shadow-[10px_10px_0px_0px_#000]' : 'shadow-none'} ${hasStartedRunning ? 'fixed z-[100]' : 'relative md:static z-[60]'} whitespace-nowrap w-44 md:w-52 pointer-events-auto`}
                             >
                                 NO
                             </motion.button>
