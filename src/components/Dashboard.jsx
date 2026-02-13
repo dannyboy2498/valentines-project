@@ -5,6 +5,7 @@ import { Heart, Camera, Images, BookHeart, Star, Home, ChevronRight, ChevronLeft
 import FireworksOverlay from './FireworksOverlay';
 import { IMAGE_ASSETS } from '../config/assets';
 import { DASHBOARD_CONTENT } from '../config/content';
+import HeartParticles from './HeartParticles';
 
 const Dashboard = ({ showFireworks = true }) => {
     const [activeTab, setActiveTab] = useState('cover'); // 'cover' | 'reasons' | 'memories'
@@ -27,6 +28,7 @@ const Dashboard = ({ showFireworks = true }) => {
 
 
     const [direction, setDirection] = useState(0);
+    const [hoverZone, setHoverZone] = useState(null); // 'left' | 'middle' | 'right' | null
 
     const handleTabChange = (newTab) => {
         const nextIdx = tabToIndex[newTab];
@@ -44,16 +46,27 @@ const Dashboard = ({ showFireworks = true }) => {
         handleTabChange(tabs[nextIdx]);
     };
 
+    const handleMouseMove = (e) => {
+        const rect = e.currentTarget.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const width = rect.width;
+
+        if (x < width * 0.3) setHoverZone('left');
+        else if (x > width * 0.7) setHoverZone('right');
+        else setHoverZone('middle');
+    };
+
     const handleCardClick = (e) => {
         const rect = e.currentTarget.getBoundingClientRect();
         const x = e.clientX - rect.left;
         const width = rect.width;
 
-        // If clicked left 30%, go back
-        if (x < width * 0.3) {
+        // If clicked middle and undiscovered content exists, go forward
+        if (x >= width * 0.3 && x <= width * 0.7 && discoveredTabs.size < tabs.length) {
+            navigate(1);
+        } else if (x < width * 0.3) {
             navigate(-1);
         } else {
-            // Otherwise go forward
             navigate(1);
         }
     };
@@ -89,13 +102,18 @@ const Dashboard = ({ showFireworks = true }) => {
 
     return (
         <div className="min-h-screen pt-20 pb-32 px-4 flex flex-col items-center justify-start bg-pink-50 overflow-x-hidden relative">
+            <HeartParticles zIndex={0} />
             {showFireworks && <FireworksOverlay />}
 
             {/* THE VIEW DECK CONTAINER */}
             <div
                 className="relative w-full max-w-lg h-[700px] z-10 flex items-center justify-center perspective-1000"
                 onMouseEnter={() => setIsHovered(true)}
-                onMouseLeave={() => setIsHovered(false)}
+                onMouseLeave={() => {
+                    setIsHovered(false);
+                    setHoverZone(null);
+                }}
+                onMouseMove={handleMouseMove}
                 onClick={handleCardClick}
             >
                 {/* FLOATING RIBBON - Only show if there's undiscovered content */}
@@ -114,14 +132,15 @@ const Dashboard = ({ showFireworks = true }) => {
                     )}
                 </AnimatePresence>
 
-                {/* NAVIGATION ARROW HINT */}
+                {/* NAVIGATION ARROW HINT - DYNAMIC COLORS */}
                 <AnimatePresence>
                     {isHovered && activeTab !== 'memories' && (
                         <motion.div
                             initial={{ opacity: 0, x: -10 }}
                             animate={{ opacity: 1, x: 0 }}
                             exit={{ opacity: 0, x: -10 }}
-                            className="absolute -right-16 top-1/2 -translate-y-1/2 z-50 text-pink-500 animate-pulse hidden md:block"
+                            className={`absolute -right-16 top-1/2 -translate-y-1/2 z-50 animate-pulse hidden md:block transition-colors duration-200 ${hoverZone === 'right' || hoverZone === 'middle' ? 'text-pink-500' : 'text-gray-300'
+                                }`}
                         >
                             <ChevronRight size={64} strokeWidth={3} />
                         </motion.div>
@@ -131,7 +150,8 @@ const Dashboard = ({ showFireworks = true }) => {
                             initial={{ opacity: 0, x: 10 }}
                             animate={{ opacity: 1, x: 0 }}
                             exit={{ opacity: 0, x: 10 }}
-                            className="absolute -left-16 top-1/2 -translate-y-1/2 z-50 text-gray-400 animate-pulse hidden md:block"
+                            className={`absolute -left-16 top-1/2 -translate-y-1/2 z-50 animate-pulse hidden md:block transition-colors duration-200 ${hoverZone === 'left' ? 'text-pink-500' : 'text-gray-300'
+                                }`}
                         >
                             <ChevronLeft size={64} strokeWidth={3} />
                         </motion.div>
@@ -258,44 +278,43 @@ const Dashboard = ({ showFireworks = true }) => {
                     layout
                     className="flex items-center gap-4 pointer-events-auto bg-white/95 backdrop-blur-sm border-4 border-black p-3 shadow-[8px_8px_0px_0px_#000]"
                 >
-                    {/* Discovery Icons */}
-                    {tabs.map((tab) => {
+                    {tabs.map((tab, idx) => {
                         const Icon = tab === 'cover' ? Home : tab === 'reasons' ? BookHeart : Images;
                         const isDiscovered = discoveredTabs.has(tab);
                         const isActive = activeTab === tab;
+
+                        // ONLY show the button if it's discovered OR if it's the NEXT one to discover
+                        const isNextToDiscover = !isDiscovered && tabs.findIndex(t => !discoveredTabs.has(t)) === idx;
+
+                        if (!isDiscovered && !isNextToDiscover) return null;
+
                         const colorClass = tab === 'reasons' ? 'bg-pink-500' : tab === 'memories' ? 'bg-yellow-400' : 'bg-black';
                         const textColor = tab === 'memories' ? 'text-black' : 'text-white';
-
-                        if (!isDiscovered) return null;
 
                         return (
                             <motion.button
                                 key={tab}
-                                layout
-                                initial={{ scale: 0, opacity: 0 }}
-                                animate={{ scale: 1, opacity: 1 }}
-                                onClick={() => handleTabChange(tab)}
-                                className={`p-3 border-4 border-black transition-all ${isActive ? `${colorClass} ${textColor}` : 'bg-white hover:bg-pink-50 shadow-[2px_2px_0px_0px_#000]'}`}
+                                layoutId={`nav-${tab}`}
+                                onClick={() => isDiscovered && handleTabChange(tab)}
+                                className={`w-14 h-14 flex items-center justify-center transition-all ${!isDiscovered
+                                    ? 'bg-transparent border-none cursor-default'
+                                    : `border-4 border-black ${isActive
+                                        ? `${colorClass} ${textColor} shadow-none translate-x-1 translate-y-1`
+                                        : 'bg-white hover:bg-pink-50 shadow-[4px_4px_0px_0px_#000]'}`
+                                    }`}
                             >
-                                <Icon size={24} />
+                                {isDiscovered ? (
+                                    <Icon size={28} />
+                                ) : (
+                                    <motion.div
+                                        initial={{ scale: 0 }}
+                                        animate={{ scale: 1 }}
+                                        className="w-9 h-9 bg-gray-200 border-4 border-black shadow-[2px_2px_0px_0px_#000] rotate-6"
+                                    />
+                                )}
                             </motion.button>
                         );
                     })}
-
-                    {/* Discovery Dots (even spacing) */}
-                    {tabs.some(tab => !discoveredTabs.has(tab)) && (
-                        <div className="flex items-center gap-3 px-2">
-                            {tabs.map((tab) => !discoveredTabs.has(tab) && (
-                                <motion.div
-                                    key={tab}
-                                    layout
-                                    initial={{ scale: 0 }}
-                                    animate={{ scale: 1 }}
-                                    className="w-3 h-3 rounded-full bg-gray-300 border-2 border-black shadow-[2px_2px_0px_0px_#000]"
-                                />
-                            ))}
-                        </div>
-                    )}
                 </motion.div>
             </div>
 

@@ -14,7 +14,7 @@ const HeartIcon = ({ size = 24, className = "" }) => (
     </svg>
 );
 
-const HeartParticles = () => {
+const HeartParticles = ({ zIndex = 9999 }) => {
     const [hearts, setHearts] = useState([]);
 
     useEffect(() => {
@@ -41,7 +41,7 @@ const HeartParticles = () => {
     }, []);
 
     return (
-        <div className="fixed inset-0 pointer-events-none z-[9999] overflow-hidden">
+        <div className="fixed inset-0 pointer-events-none overflow-hidden" style={{ zIndex }}>
             <AnimatePresence>
                 {hearts.map(heart => (
                     <motion.div

@@ -4,7 +4,6 @@ import CountdownScreen from './components/CountdownScreen';
 import LockScreen from './components/LockScreen';
 import QuestionScreen from './components/QuestionScreen';
 import Dashboard from './components/Dashboard';
-import HeartParticles from './components/HeartParticles';
 
 function App() {
   // BYPASS LOGIC:
@@ -31,7 +30,6 @@ function App() {
     return (
       <main className="min-h-screen bg-[#fce7f3] relative">
         <CountdownScreen timeRemaining={timeRemaining} />
-        <HeartParticles />
       </main>
     );
   }
@@ -41,7 +39,6 @@ function App() {
     return (
       <main className="min-h-screen bg-[#fce7f3] relative">
         <LockScreen onUnlock={() => setIsCodeUnlocked(true)} />
-        <HeartParticles />
       </main>
     );
   }
@@ -54,7 +51,6 @@ function App() {
       ) : (
         <Dashboard />
       )}
-      <HeartParticles />
     </main>
   );
 }
