@@ -221,6 +221,16 @@ const Dashboard = ({ showFireworks = true }) => {
                                     <h2 className="text-lg lg:text-2xl font-black uppercase italic tracking-tighter">{DASHBOARD_CONTENT.messageTitle}</h2>
                                 </div>
 
+                                <motion.div
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    className="border-[3px] lg:border-4 border-black p-4 bg-yellow-400 shadow-[4px_4px_0px_0px_#000] lg:shadow-[6px_6px_0px_0px_#000] rotate-1"
+                                >
+                                    <p className="text-lg lg:text-xl font-black uppercase text-center tracking-tighter">
+                                        Saying 'Yes' was the best choice you ever made!
+                                    </p>
+                                </motion.div>
+
                                 {/* REASONS BOX (NOW ABOVE MESSAGE) */}
                                 <div className="border-[3px] lg:border-4 border-black p-4 lg:p-6 bg-white shadow-[4px_4px_0px_0px_#000] lg:shadow-[6px_6px_0px_0px_#000]">
                                     <h2 className="text-xs lg:text-lg font-black mb-2 lg:mb-4 uppercase tracking-tighter lg:tracking-normal">Reasons Why I Love You:</h2>
@@ -232,9 +242,13 @@ const Dashboard = ({ showFireworks = true }) => {
                                                 animate={{ opacity: 1 }}
                                                 exit={{ opacity: 0 }}
                                                 className="text-lg lg:text-2xl font-black italic text-center relative z-10 leading-tight"
-                                            >
-                                                {currentReason}
-                                            </motion.p>
+                                                dangerouslySetInnerHTML={{
+                                                    __html: currentReason
+                                                        .replace(/\\n/g, '<br/>')
+                                                        .replace(/\n/g, '<br/>')
+                                                        .replace(/\*\*(.*?)\*\*/g, '<span class="text-pink-600 font-black">$1</span>')
+                                                }}
+                                            />
                                         </AnimatePresence>
                                         <div className="absolute top-1 left-1 lg:top-2 lg:left-2 opacity-5">
                                             <Heart size={24} lg:size={40} fill="currentColor" className="text-pink-300" />
@@ -250,9 +264,15 @@ const Dashboard = ({ showFireworks = true }) => {
 
                                 {/* MESSAGE BOX (NOW BELOW REASONS) */}
                                 <div className="border-[3px] lg:border-4 border-black p-4 lg:p-6 bg-violet-50 shadow-[4px_4px_0px_0px_#000] lg:shadow-[6px_6px_0px_0px_#000]">
-                                    <p className="text-sm lg:text-lg font-black italic text-gray-800 leading-[1.2] lg:leading-tight mb-4 lg:mb-8">
-                                        {DASHBOARD_CONTENT.personalMessage}
-                                    </p>
+                                    <p
+                                        className="text-sm lg:text-lg font-black italic text-gray-800 leading-[1.2] lg:leading-tight mb-4 lg:mb-8"
+                                        dangerouslySetInnerHTML={{
+                                            __html: DASHBOARD_CONTENT.personalMessage
+                                                .replace(/\\n/g, '<br/>')
+                                                .replace(/\n/g, '<br/>')
+                                                .replace(/\*\*(.*?)\*\*/g, '<span class="text-pink-600 font-black">$1</span>')
+                                        }}
+                                    />
                                     <div className="text-right border-t-[2px] border-black/10 pt-2 lg:pt-4">
                                         <p className="font-black text-pink-600 text-base lg:text-xl italic">{DASHBOARD_CONTENT.signature}</p>
                                     </div>

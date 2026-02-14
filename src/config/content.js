@@ -12,7 +12,7 @@ export const DASHBOARD_CONTENT = {
 
     personalMessage: import.meta.env.VITE_DASHBOARD_PERSONAL_MESSAGE || "Saying 'Yes' was the best choice you could have made! Happy Valentine's Day! I'm so lucky to have you. ❤️",
 
-    signature: import.meta.env.VITE_DASHBOARD_SIGNATURE || "Love always,",
+    signature: import.meta.env.VITE_DASHBOARD_SIGNATURE || "Love always, [YOUR NAME]",
 
     // PRONOUN CONFIG
     pronoun: import.meta.env.VITE_PRONOUN || "She",
@@ -21,8 +21,8 @@ export const DASHBOARD_CONTENT = {
     loadingText: import.meta.env.VITE_MEMORIES_LOADING_TEXT || "Loading Shared Content...",
 
     // LOCK SCREEN CONFIG
-    lockCode: import.meta.env.VITE_LOCK_CODE || "ROSES",
-    lockHint: import.meta.env.VITE_LOCK_HINT || "I age quickly, but I'm picked every year. We cannot speak yet say \"I love you\". What am I?",
+    lockCode: import.meta.env.VITE_LOCK_CODE || "ROSE",
+    lockHint: import.meta.env.VITE_LOCK_HINT || "I age quickly, but I'm picked every year. I cannot speak yet say \"I love you\". What am I?",
 
     // IMAGE CONFIG
     initialImage: import.meta.env.VITE_INITIAL_IMAGE || null, // If null, uses MailSymbol

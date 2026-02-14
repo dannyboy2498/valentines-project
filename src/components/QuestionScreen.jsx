@@ -305,9 +305,9 @@ const QuestionScreen = ({ onYes }) => {
                     </motion.div>
                 )}
 
-                {noCount < 15 && <div className="flex-grow w-full" />}
+                {noCount < 13 && <div className="flex-grow w-full" />}
 
-                {noCount < 15 && (
+                {noCount < 13 && (
                     <div className={`flex ${isTrickActive ? 'flex-col-reverse lg:flex-row-reverse' : 'flex-col lg:flex-row'} items-center justify-center gap-6 lg:gap-24 relative w-full pt-6 pb-2 lg:pb-10`}>
                         <motion.button
                             animate={{ opacity: 1, scale: yesScale }}
