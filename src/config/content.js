@@ -27,6 +27,10 @@ export const DASHBOARD_CONTENT = {
     // IMAGE CONFIG
     initialImage: import.meta.env.VITE_INITIAL_IMAGE || null, // If null, uses MailSymbol
 
+    // MUSIC CONFIG
+    musicPath: import.meta.env.VITE_MUSIC_PATH || "/music.mp3",
+    musicTitle: import.meta.env.VITE_MUSIC_TITLE || "Our Song",
+
     // MEMORIES CONFIG
     // Provide a list of image URLs in your .env file (supports commas or newlines)
     memories: (() => {

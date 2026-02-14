@@ -33,3 +33,17 @@
     @apply bg-white border-4 border-black p-4 shadow-[10px_10px_0px_0px_#000];
   }
 }
+
+.animate-spin-slow {
+  animation: custom-spin 8s linear infinite;
+}
+
+@keyframes custom-spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { reasons } from '../data/reasons';
-import { Heart, Camera, Images, BookHeart, Star, Home, ChevronRight, ChevronLeft, Play } from 'lucide-react';
+import { Heart, Camera, Images, BookHeart, Star, Home, ChevronRight, ChevronLeft, Play, Pause, Music, Volume2, VolumeX, SkipBack, SkipForward } from 'lucide-react';
 import FireworksOverlay from './FireworksOverlay';
 import { IMAGE_ASSETS } from '../config/assets';
 import { DASHBOARD_CONTENT } from '../config/content';
@@ -74,6 +74,38 @@ const Dashboard = ({ showFireworks = true }) => {
     const [discoveredTabs, setDiscoveredTabs] = useState(new Set(['cover']));
     const [currentReason, setCurrentReason] = useState(reasons[0]);
     const [isHovered, setIsHovered] = useState(false);
+
+    // Music State
+    const [isPlaying, setIsPlaying] = useState(false);
+    const audioRef = useRef(null);
+
+    useEffect(() => {
+        // Auto-play on mount
+        if (audioRef.current) {
+            audioRef.current.play().then(() => {
+                setIsPlaying(true);
+            }).catch(() => {
+                console.log("Autoplay blocked, waiting for user interaction");
+            });
+        }
+        return () => {
+            if (audioRef.current) {
+                audioRef.current.pause();
+            }
+        };
+    }, []);
+
+    const toggleMusic = (e) => {
+        e.stopPropagation();
+        if (audioRef.current) {
+            if (isPlaying) {
+                audioRef.current.pause();
+            } else {
+                audioRef.current.play();
+            }
+            setIsPlaying(!isPlaying);
+        }
+    };
 
     const tabs = ['cover', 'reasons', 'memories'];
     const tabToIndex = { 'cover': 0, 'reasons': 1, 'memories': 2 };
@@ -170,7 +202,7 @@ const Dashboard = ({ showFireworks = true }) => {
     };
 
     return (
-        <div className="min-h-full w-full pt-12 lg:pt-20 pb-32 px-4 flex flex-col items-center justify-start bg-transparent overflow-visible relative">
+        <div className="min-h-full w-full pt-12 lg:pt-20 pb-48 px-4 flex flex-col items-center justify-start bg-transparent overflow-visible relative">
             <HeartParticles zIndex={0} />
             {showFireworks && <FireworksOverlay />}
 
@@ -248,17 +280,21 @@ const Dashboard = ({ showFireworks = true }) => {
                             exit="exit"
                             className={`absolute inset-0 w-full h-full bg-white border-[6px] lg:border-[8px] border-black p-4 lg:p-8 flex flex-col transition-all duration-300 ${isHovered ? 'shadow-[20px_20px_0px_0px_rgba(0,0,0,0.2)] lg:shadow-[40px_40px_0px_0px_rgba(0,0,0,0.2)] -translate-x-1 lg:-translate-x-2 -translate-y-1 lg:-translate-y-2' : 'shadow-[15px_15px_0px_0px_#000] lg:shadow-[20px_20px_0px_0px_#000]'}`}
                         >
-                            {/* LONG CAT PHOTO (78% height) */}
-                            <div className="w-full h-[70%] lg:h-[78%] border-[3px] lg:border-4 border-black overflow-hidden bg-gray-100 mb-4 relative">
+                            {/* HERO PHOTO */}
+                            <div className="w-full h-[70%] lg:h-[78%] border-[3px] lg:border-4 border-black overflow-hidden bg-gray-100 mb-4 relative group">
                                 <img src={IMAGE_ASSETS.dashboard_hero} alt="Cover" className="w-full h-full object-cover" />
+
+                                {/* INTERACTIVE OVERLAY */}
                                 {isHovered && (
-                                    <div className="absolute inset-0 bg-pink-500/10 flex items-center justify-center">
+                                    <div className="absolute inset-0 bg-pink-500/10 flex items-center justify-center pointer-events-none">
                                         <div className="bg-white border-[3px] lg:border-4 border-black p-3 lg:p-4 shadow-[4px_4px_0px_0px_#000] lg:shadow-[6px_6px_0px_0px_#000] -rotate-2">
                                             <p className="font-black uppercase text-sm lg:text-xl">Click to see inside!</p>
                                         </div>
                                     </div>
                                 )}
                             </div>
+
+                            <audio ref={audioRef} src={DASHBOARD_CONTENT.musicPath} loop />
 
                             <div className="text-center flex-grow flex flex-col items-center justify-center">
                                 <Heart size={24} lg:size={36} className="text-red-500 fill-red-500 mb-1" />
@@ -390,8 +426,61 @@ const Dashboard = ({ showFireworks = true }) => {
                 </AnimatePresence>
             </div>
 
-            {/* GLOBAL NAVIGATION BAR - Now Absolute to scale with AppScaler */}
-            <div className="absolute bottom-6 lg:bottom-8 left-0 w-full flex justify-center z-50 pointer-events-none px-4">
+            {/* MUSIC PLAYER - BOTTOM LEFT */}
+            <div className="absolute bottom-6 lg:bottom-10 left-6 lg:left-12 z-[60] pointer-events-none">
+                <motion.div
+                    initial={{ opacity: 0, x: -50 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 1 }}
+                    className="pointer-events-auto"
+                >
+                    <div className="flex items-center gap-3 lg:gap-5">
+                        {/* Spinning Icon */}
+                        <div className={`w-10 h-10 lg:w-14 lg:h-14 bg-yellow-400 border-[3px] lg:border-4 border-black flex items-center justify-center shadow-[3px_3px_0px_0px_#000] ${isPlaying ? 'animate-spin-slow' : ''}`}>
+                            <Music size={20} lg:size={28} className="text-black" />
+                        </div>
+
+                        {/* Song Info & Controls */}
+                        <div className="flex flex-col gap-1 lg:gap-2">
+                            <div className="overflow-hidden">
+                                <p className="text-[10px] lg:text-sm font-black text-black uppercase truncate tracking-tighter w-24 lg:w-48 leading-none">
+                                    {DASHBOARD_CONTENT.musicTitle}
+                                </p>
+                                <p className="text-[8px] lg:text-[10px] text-pink-500 font-bold uppercase tracking-widest mt-1">
+                                    {isPlaying ? 'Now Playing' : 'Paused'}
+                                </p>
+                            </div>
+
+                            {/* Playback Controls */}
+                            <div className="flex items-center gap-2 lg:gap-3">
+                                <button
+                                    onClick={(e) => { e.stopPropagation(); if (audioRef.current) audioRef.current.currentTime = 0; }}
+                                    className="p-1 hover:text-pink-500 transition-colors"
+                                >
+                                    <SkipBack size={16} lg:size={20} fill="currentColor" />
+                                </button>
+
+                                <button
+                                    onClick={toggleMusic}
+                                    className="bg-black text-white p-1.5 lg:p-2 border-2 border-black shadow-[2px_2px_0px_0px_#a1a1a1] hover:bg-pink-500 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
+                                >
+                                    {isPlaying ? <Pause size={14} lg:size={18} fill="white" /> : <Play size={14} lg:size={18} fill="white" />}
+                                </button>
+
+                                <button
+                                    onClick={(e) => { e.stopPropagation(); if (audioRef.current) audioRef.current.currentTime = 0; }}
+                                    className="p-1 hover:text-pink-500 transition-colors"
+                                >
+                                    <SkipForward size={16} lg:size={20} fill="currentColor" />
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </motion.div>
+            </div>
+
+            {/* GLOBAL NAVIGATION BAR - BOTTOM CENTER */}
+            <div className="absolute bottom-6 lg:bottom-10 left-1/2 -translate-x-1/2 z-[60] pointer-events-none">
                 <motion.div
                     layout
                     className="flex items-center gap-3 lg:gap-4 pointer-events-auto bg-white/95 backdrop-blur-sm border-[3px] lg:border-4 border-black p-2 lg:p-3 shadow-[6px_6px_0px_0px_#000] lg:shadow-[8px_8px_0px_0px_#000]"
