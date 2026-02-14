@@ -12,7 +12,7 @@ Happy Valentine's Honey Bunny ❤️
 
 P.S and hopefully now you understand what I do :)`,signature:`
 Love u 1000,
--El Dannyboi`,pronoun:"She",lockCode:"ROSES",lockHint:`I age quickly, but I'm picked every year. We cannot speak yet say \\"I love you\\". What am I?`,musicPath:"/music.mp3",musicTitle:"Porquería mi porquerita",memories:(()=>{const a=`
+-El Dannyboi`,pronoun:"She",lockCode:"ROSES",lockHint:`I age quickly, but I'm picked every year. We cannot speak yet say "I love you". What am I?`,musicPath:"/music.mp3",musicTitle:"Porquería mi porquerita",memories:(()=>{const a=`
 [Our First Date, or at least one of them],
 /images/first_date.jpg,
 /videos/cause_im_losing.webm,
