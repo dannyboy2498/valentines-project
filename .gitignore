@@ -24,6 +24,10 @@ dist-ssr
 *.sw?
 .env
 
+#custom
+/src/data/*
+/src/data/reasons.js
+
 # Package 
 /public/CNAME
 /public/images/
