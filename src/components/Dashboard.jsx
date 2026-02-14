@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { reasons } from '../data/reasons';
 import { Heart, Camera, Images, BookHeart, Star, Home, ChevronRight, ChevronLeft, Play, Pause, Music, Volume2, VolumeX, SkipBack, SkipForward } from 'lucide-react';
@@ -77,6 +78,7 @@ const Dashboard = ({ showFireworks = true }) => {
 
     // Music State
     const [isPlaying, setIsPlaying] = useState(false);
+    const [isMuted, setIsMuted] = useState(false);
     const audioRef = useRef(null);
 
     useEffect(() => {
@@ -95,15 +97,12 @@ const Dashboard = ({ showFireworks = true }) => {
         };
     }, []);
 
-    const toggleMusic = (e) => {
+    const toggleMute = (e) => {
         e.stopPropagation();
         if (audioRef.current) {
-            if (isPlaying) {
-                audioRef.current.pause();
-            } else {
-                audioRef.current.play();
-            }
-            setIsPlaying(!isPlaying);
+            const newMuted = !isMuted;
+            audioRef.current.muted = newMuted;
+            setIsMuted(newMuted);
         }
     };
 
@@ -297,7 +296,7 @@ const Dashboard = ({ showFireworks = true }) => {
                             <audio ref={audioRef} src={DASHBOARD_CONTENT.musicPath} loop />
 
                             <div className="text-center flex-grow flex flex-col items-center justify-center">
-                                <Heart size={24} lg:size={36} className="text-red-500 fill-red-500 mb-1" />
+                                <Heart className="w-6 h-6 lg:w-9 lg:h-9 text-red-500 fill-red-500 mb-1" />
                                 <h1 className="text-2xl lg:text-3xl font-black uppercase tracking-tighter">{DASHBOARD_CONTENT.pronoun} Said Yes!</h1>
                             </div>
                         </motion.div>
@@ -316,7 +315,7 @@ const Dashboard = ({ showFireworks = true }) => {
                             <div className="space-y-4 lg:space-y-6">
                                 {/* COMPACT HEADER */}
                                 <div className="flex items-center gap-2 lg:gap-3 mb-2 lg:mb-4 pb-1 lg:pb-2 border-b-[4px] lg:border-b-6 border-black">
-                                    <Heart size={20} lg:size={28} fill="#ec4899" className="text-pink-500" />
+                                    <Heart className="w-5 h-5 lg:w-7 lg:h-7 text-pink-500" fill="#ec4899" />
                                     <h2 className="text-lg lg:text-2xl font-black uppercase italic tracking-tighter">{DASHBOARD_CONTENT.messageTitle}</h2>
                                 </div>
 
@@ -391,7 +390,7 @@ const Dashboard = ({ showFireworks = true }) => {
                             className={`absolute inset-0 w-full h-full bg-white border-[6px] lg:border-[8px] border-black p-4 lg:p-8 flex flex-col overflow-hidden transition-all duration-300 ${isHovered ? 'shadow-[20px_20px_0px_0px_rgba(0,0,0,0.2)] lg:shadow-[40px_40px_0px_0px_rgba(0,0,0,0.2)] -translate-x-1 lg:-translate-x-2 -translate-y-1 lg:-translate-y-2' : 'shadow-[15px_15px_0px_0px_#000] lg:shadow-[20px_20px_0px_0px_#000]'}`}
                         >
                             <div className="flex items-center gap-2 lg:gap-3 mb-4 lg:mb-6 pb-1 lg:pb-2 border-b-[4px] lg:border-b-6 border-black shrink-0">
-                                <Camera size={20} lg:size={28} className="text-yellow-500" />
+                                <Camera className="w-5 h-5 lg:w-7 lg:h-7 text-yellow-500" />
                                 <h2 className="text-lg lg:text-2xl font-black uppercase italic tracking-tighter">Memories</h2>
                             </div>
 
@@ -426,58 +425,45 @@ const Dashboard = ({ showFireworks = true }) => {
                 </AnimatePresence>
             </div>
 
-            {/* MUSIC PLAYER - BOTTOM LEFT */}
-            <div className="absolute bottom-6 lg:bottom-10 left-6 lg:left-12 z-[60] pointer-events-none">
-                <motion.div
-                    initial={{ opacity: 0, x: -50 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 1 }}
-                    className="pointer-events-auto"
-                >
-                    <div className="flex items-center gap-3 lg:gap-5">
-                        {/* Spinning Icon */}
-                        <div className={`w-10 h-10 lg:w-14 lg:h-14 bg-yellow-400 border-[3px] lg:border-4 border-black flex items-center justify-center shadow-[3px_3px_0px_0px_#000] ${isPlaying ? 'animate-spin-slow' : ''}`}>
-                            <Music size={20} lg:size={28} className="text-black" />
-                        </div>
+            {/* MUSIC PLAYER - WINDOW PINNED (PORTAL) */}
+            {createPortal(
+                <div className="fixed bottom-6 lg:bottom-10 left-6 lg:left-10 z-[200] pointer-events-none">
+                    <motion.div
+                        initial={{ opacity: 0, x: -50 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 1 }}
+                        className="pointer-events-auto"
+                    >
+                        <div className="flex items-center gap-5 lg:gap-7 items-end">
+                            {/* Spinning Icon / Mute Toggle */}
+                            <button
+                                onClick={toggleMute}
+                                className={`w-14 h-14 lg:w-19 lg:h-19 bg-yellow-400 border-[3px] lg:border-4 border-black flex items-center justify-center shadow-[4px_4px_0px_0px_#000] lg:shadow-[6px_6px_0px_0px_#000] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all relative overflow-hidden group mb-2 lg:mb-[11px] ${isPlaying ? 'animate-spin-slow' : ''}`}
+                            >
+                                <Music className="w-7 h-7 lg:w-9 lg:h-9 text-black transition-opacity" style={{ opacity: isMuted ? 0.4 : 1 }} />
 
-                        {/* Song Info & Controls */}
-                        <div className="flex flex-col gap-1 lg:gap-2">
-                            <div className="overflow-hidden">
-                                <p className="text-[10px] lg:text-sm font-black text-black uppercase truncate tracking-tighter w-24 lg:w-48 leading-none">
+                                {/* Diagonal Line for Mute */}
+                                {isMuted && (
+                                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                        <div className="w-[120%] h-[3px] lg:h-[4px] bg-red-500 rotate-45 border-y border-black/20" />
+                                    </div>
+                                )}
+                            </button>
+
+                            {/* Song Info */}
+                            <div className="flex flex-col min-w-0 mb-[13.5px] lg:mb-[18.5px]">
+                                <p className="text-[11px] lg:text-lg font-black text-black uppercase tracking-tighter w-auto max-w-[75px] lg:max-w-[180px] leading-[1.1] mb-1 lg:mb-1.5 italic line-clamp-2 overflow-hidden">
                                     {DASHBOARD_CONTENT.musicTitle}
                                 </p>
-                                <p className="text-[8px] lg:text-[10px] text-pink-500 font-bold uppercase tracking-widest mt-1">
-                                    {isPlaying ? 'Now Playing' : 'Paused'}
+                                <p className="text-[8px] lg:text-[10px] text-pink-500 font-bold uppercase tracking-[0.2em] leading-none mt-1 lg:mt-1.5">
+                                    {isMuted ? 'Muted' : 'Now Playing'}
                                 </p>
                             </div>
-
-                            {/* Playback Controls */}
-                            <div className="flex items-center gap-2 lg:gap-3">
-                                <button
-                                    onClick={(e) => { e.stopPropagation(); if (audioRef.current) audioRef.current.currentTime = 0; }}
-                                    className="p-1 hover:text-pink-500 transition-colors"
-                                >
-                                    <SkipBack size={16} lg:size={20} fill="currentColor" />
-                                </button>
-
-                                <button
-                                    onClick={toggleMusic}
-                                    className="bg-black text-white p-1.5 lg:p-2 border-2 border-black shadow-[2px_2px_0px_0px_#a1a1a1] hover:bg-pink-500 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
-                                >
-                                    {isPlaying ? <Pause size={14} lg:size={18} fill="white" /> : <Play size={14} lg:size={18} fill="white" />}
-                                </button>
-
-                                <button
-                                    onClick={(e) => { e.stopPropagation(); if (audioRef.current) audioRef.current.currentTime = 0; }}
-                                    className="p-1 hover:text-pink-500 transition-colors"
-                                >
-                                    <SkipForward size={16} lg:size={20} fill="currentColor" />
-                                </button>
-                            </div>
                         </div>
-                    </div>
-                </motion.div>
-            </div>
+                    </motion.div>
+                </div>,
+                document.body
+            )}
 
             {/* GLOBAL NAVIGATION BAR - BOTTOM CENTER */}
             <div className="absolute bottom-6 lg:bottom-10 left-1/2 -translate-x-1/2 z-[60] pointer-events-none">
@@ -511,7 +497,7 @@ const Dashboard = ({ showFireworks = true }) => {
                                     }`}
                             >
                                 {isDiscovered ? (
-                                    <Icon size={24} lg:size={28} />
+                                    <Icon className="w-6 h-6 lg:w-7 lg:h-7" />
                                 ) : (
                                     <motion.div
                                         initial={{ scale: 0 }}
