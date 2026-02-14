@@ -11,10 +11,11 @@ const MemoryItem = ({ item, index }) => {
     const [isWide, setIsWide] = useState(false);
     const videoRef = useRef(null);
     const url = item.url;
-    const isVideo = /\.(mp4|webm|mov|ogg|m4v)$/i.test(url);
+
+    // Robust video detection: ignore query params and handle common formats
+    const isVideo = /\.(mp4|webm|mov|ogg|m4v|quicktime)($|\?)/i.test(url);
 
     const checkWide = (w, h) => {
-        // threshold to consider it "wide" enough to span both columns
         if (w > h * 1.2) setIsWide(true);
     };
 
@@ -36,14 +37,20 @@ const MemoryItem = ({ item, index }) => {
             {isVideo ? (
                 <video
                     ref={videoRef}
-                    src={url}
                     onLoadedMetadata={(e) => checkWide(e.target.videoWidth, e.target.videoHeight)}
+                    onError={(e) => console.error("Video failed to load:", url, e)}
                     muted
                     loop
                     playsInline
                     autoPlay
+                    preload="metadata"
                     className="w-full h-full object-cover"
-                />
+                >
+                    <source src={url} type="video/mp4; codecs='avc1.42E01E, mp4a.40.2'" />
+                    <source src={url} type="video/mp4" />
+                    <source src={url} type="video/quicktime" />
+                    <source src={url} />
+                </video>
             ) : (
                 <img
                     src={url}
@@ -353,11 +360,11 @@ const Dashboard = ({ showFireworks = true }) => {
 
                             {/* Scrollable Gallery Area */}
                             <div className="flex-grow overflow-y-auto no-scrollbar pr-1">
-                                <div className="grid grid-cols-2 gap-3 lg:gap-4 mb-6 grid-flow-dense">
+                                <div className="grid grid-cols-2 gap-3 lg:gap-4 mb-6">
                                     {DASHBOARD_CONTENT.memories.length > 0 ? (
                                         DASHBOARD_CONTENT.memories.map((item, i) => (
                                             item.type === 'header' ? (
-                                                <div key={i} className="col-span-2 border-[3px] lg:border-4 border-black p-3 lg:p-4 bg-yellow-400 shadow-[5px_5px_0px_0px_#000] lg:shadow-[8px_8px_0px_0px_#000] my-4 first:mt-0 rotate-[-1deg] relative z-10">
+                                                <div key={i} className="col-span-2 border-[3px] lg:border-4 border-black p-3 lg:p-4 bg-yellow-400 shadow-[5px_5px_0px_0px_#000] lg:shadow-[8px_8px_0px_0px_#000] mt-6 mb-4 first:mt-0 rotate-[-1deg] relative z-10">
                                                     <p className="text-sm lg:text-xl font-black uppercase text-center tracking-tighter italic leading-none">
                                                         {item.text}
                                                     </p>
