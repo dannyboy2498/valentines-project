@@ -25,5 +25,5 @@ dist-ssr
 .env
 
 # Package 
-CNAME
+/public/CNAME
 /public/images/

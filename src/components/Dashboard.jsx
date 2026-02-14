@@ -300,10 +300,18 @@ const Dashboard = ({ showFireworks = true }) => {
                             <div className="flex-grow overflow-y-auto no-scrollbar pr-1">
                                 <div className="grid grid-cols-2 gap-3 lg:gap-4 mb-6">
                                     {DASHBOARD_CONTENT.memories.length > 0 ? (
-                                        DASHBOARD_CONTENT.memories.map((url, i) => (
-                                            <div key={i} className="aspect-square border-[3px] lg:border-4 border-black bg-gray-100 shadow-[3px_3px_0px_0px_#000] lg:shadow-[4px_4px_0px_0px_#000] relative overflow-hidden group">
-                                                <img src={url} alt={`Memory ${i + 1}`} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110" />
-                                            </div>
+                                        DASHBOARD_CONTENT.memories.map((item, i) => (
+                                            item.type === 'header' ? (
+                                                <div key={i} className="col-span-2 border-[3px] lg:border-4 border-black p-3 lg:p-4 bg-yellow-400 shadow-[5px_5px_0px_0px_#000] lg:shadow-[8px_8px_0px_0px_#000] my-4 first:mt-0 rotate-[-1deg] relative z-10">
+                                                    <p className="text-sm lg:text-xl font-black uppercase text-center tracking-tighter italic leading-none">
+                                                        {item.text}
+                                                    </p>
+                                                </div>
+                                            ) : (
+                                                <div key={i} className="aspect-square border-[3px] lg:border-4 border-black bg-gray-100 shadow-[3px_3px_0px_0px_#000] lg:shadow-[4px_4px_0px_0px_#000] relative overflow-hidden group">
+                                                    <img src={item.url} alt={`Memory ${i + 1}`} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110" />
+                                                </div>
+                                            )
                                         ))
                                     ) : (
                                         [1, 2, 3, 4, 5, 6].map((i) => (
@@ -314,11 +322,6 @@ const Dashboard = ({ showFireworks = true }) => {
                                     )}
                                 </div>
 
-                                {DASHBOARD_CONTENT.loadingText && (
-                                    <div className="mb-4 border-[3px] lg:border-4 border-black p-3 lg:p-4 bg-white shadow-[4px_4px_0px_0px_#000] lg:shadow-[6px_6px_0px_0px_#000] text-center italic text-[10px] lg:text-xs font-black uppercase text-gray-400">
-                                        {DASHBOARD_CONTENT.loadingText}
-                                    </div>
-                                )}
                             </div>
                         </motion.div>
                     )}

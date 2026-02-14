@@ -29,7 +29,21 @@ export const DASHBOARD_CONTENT = {
 
     // MEMORIES CONFIG
     // Provide a list of image URLs in your .env file (supports commas or newlines)
-    memories: (import.meta.env.VITE_MEMORIES_IMAGES || "").split(/[\n,]+/).map(str => str.trim()).filter(Boolean),
+    memories: (() => {
+        const raw = import.meta.env.VITE_MEMORIES_IMAGES || "";
+        // Match items inside [brackets] OR any sequences of non-comma/non-newline characters
+        const regex = /\[.*?\]|[^,\n]+/g;
+        const matches = raw.match(regex) || [];
+
+        return matches.map(str => {
+            const s = str.trim();
+            if (!s) return null;
+            if (s.startsWith('[') && s.endsWith(']')) {
+                return { type: 'header', text: s.slice(1, -1).trim() };
+            }
+            return { type: 'image', url: s };
+        }).filter(Boolean);
+    })(),
 
 
     // Format: YYYY-MM-DD and HH:mm:ss
