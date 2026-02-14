@@ -21,6 +21,7 @@ const QuestionScreen = ({ onYes }) => {
     const [hasStartedRunning, setHasStartedRunning] = useState(false);
     const [isInteractionBlocked, setIsInteractionBlocked] = useState(false);
     const [isTrickActive, setIsTrickActive] = useState(false);
+    const [poofs, setPoofs] = useState([]);
 
     const [mousePos, setMousePos] = useState({ x: -100, y: -100 });
     const [isMouseMoving, setIsMouseMoving] = useState(false);
@@ -30,6 +31,44 @@ const QuestionScreen = ({ onYes }) => {
     const rootRef = useRef(null);
     const isHoveringNo = useRef(false);
     const isProcessingJump = useRef(false);
+
+    // SHARED AUDIO CONTEXT
+    const audioContextRef = useRef(null);
+    const playPopSound = () => {
+        try {
+            if (!audioContextRef.current) {
+                audioContextRef.current = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            const context = audioContextRef.current;
+            if (context.state === 'suspended' || context.state === 'interrupted') {
+                context.resume();
+            }
+
+            const osc = context.createOscillator();
+            const gain = context.createGain();
+
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(800, context.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(0.01, context.currentTime + 0.15);
+
+            gain.gain.setValueAtTime(0.4, context.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, context.currentTime + 0.15);
+
+            osc.connect(gain);
+            gain.connect(context.destination);
+
+            osc.start();
+            osc.stop(context.currentTime + 0.15);
+        } catch (e) { }
+    };
+
+    const triggerPoof = (x, y) => {
+        const id = Date.now();
+        setPoofs(prev => [...prev, { id, x, y }]);
+        setTimeout(() => {
+            setPoofs(prev => prev.filter(p => p.id !== id));
+        }, 500);
+    };
 
     const PROTECTION_DELAY = 350; // Requested balance between 500ms and 250ms
 
@@ -93,6 +132,15 @@ const QuestionScreen = ({ onYes }) => {
     }, [noCount]);
 
     useEffect(() => {
+        if (noCount === 13) {
+            playPopSound();
+            // Poof near the center where buttons were
+            triggerPoof(35, 85);
+            triggerPoof(65, 85);
+        }
+    }, [noCount]);
+
+    useEffect(() => {
         const isMobile = window.innerWidth < 1024;
         const effectiveGrowthCount = Math.min(noCount, 10);
         if (effectiveGrowthCount >= 3) {
@@ -112,6 +160,8 @@ const QuestionScreen = ({ onYes }) => {
         if (noCount >= 9) {
             setIsVanish(true);
             setNoCount(10);
+            playPopSound();
+            if (percPosition) triggerPoof(percPosition.x, percPosition.y);
             return;
         }
 
@@ -147,12 +197,9 @@ const QuestionScreen = ({ onYes }) => {
                 setPercPosition({ x: initialPercX, y: initialPercY });
                 setHasStartedRunning(true);
 
-                // Docking delay – captures state for one frame, then jumps
-                setTimeout(() => {
-                    setPercPosition({ x: targetX, y: targetY });
-                    setNoCount(prev => prev + 1);
-                    isProcessingJump.current = false;
-                }, 60);
+                setPercPosition({ x: targetX, y: targetY });
+                setNoCount(prev => prev + 1);
+                isProcessingJump.current = false;
             } else {
                 isProcessingJump.current = false;
             }
@@ -233,27 +280,52 @@ const QuestionScreen = ({ onYes }) => {
     return (
         <div ref={rootRef} className="h-full w-full flex items-center justify-center relative overflow-visible select-none text-black">
             {/* Running NO button */}
-            {hasStartedRunning && !isVanish && (
-                <motion.button
-                    key="btn-no-running"
-                    onHoverStart={() => { isHoveringNo.current = true; handleNoHover(); }}
-                    onHoverEnd={() => { isHoveringNo.current = false; }}
-                    onTouchStart={() => { isHoveringNo.current = true; handleNoHover(); }}
-                    onTouchEnd={() => { isHoveringNo.current = false; }}
-                    onClick={handleNoClick}
-                    initial={false}
-                    animate={{ left: `${percPosition?.x || 50}%`, top: `${percPosition?.y || 80}%` }}
-                    style={{
-                        position: 'absolute',
-                        transform: 'translate(-50%, -50%)',
-                        zIndex: 200
-                    }}
-                    transition={{ type: "spring", stiffness: 450, damping: 25 }}
-                    className="bg-red-500 hover:bg-red-600 text-white font-black py-4 lg:py-5 px-10 lg:px-16 border-4 lg:border-6 border-black text-2xl lg:text-3xl active:translate-x-1 active:translate-y-1 shadow-[8px_8px_0px_0px_#000] lg:shadow-[10px_10px_0px_0px_#000] whitespace-nowrap w-48 lg:w-56 flex items-center justify-center leading-none"
-                >
-                    NO
-                </motion.button>
-            )}
+            <AnimatePresence>
+                {hasStartedRunning && !isVanish && (
+                    <motion.button
+                        key="btn-no-running"
+                        initial={{ opacity: 0, scale: 0 }}
+                        animate={{
+                            opacity: 1,
+                            scale: 1,
+                            left: `${percPosition?.x || 50}%`,
+                            top: `${percPosition?.y || 80}%`
+                        }}
+                        exit={{
+                            opacity: 0,
+                            scale: 0,
+                            filter: "blur(10px)",
+                            transition: { duration: 0.3 }
+                        }}
+                        whileTap={{
+                            scale: 0.9,
+                            transition: { duration: 0.1 }
+                        }}
+                        onHoverStart={() => { isHoveringNo.current = true; handleNoHover(); }}
+                        onHoverEnd={() => { isHoveringNo.current = false; }}
+                        onTouchStart={() => { isHoveringNo.current = true; handleNoHover(); }}
+                        onTouchEnd={() => { isHoveringNo.current = false; }}
+                        onClick={(e) => {
+                            if (isVanish) return;
+                            handleNoClick(e);
+                        }}
+                        style={{
+                            position: 'absolute',
+                            transform: 'translate(-50%, -50%)',
+                            zIndex: 200
+                        }}
+                        transition={{
+                            type: "spring",
+                            stiffness: 450,
+                            damping: 25,
+                            opacity: { duration: 0.2 }
+                        }}
+                        className="bg-red-500 hover:bg-red-600 text-white font-black py-4 lg:py-5 px-10 lg:px-16 border-4 lg:border-6 border-black text-2xl lg:text-3xl active:translate-x-1 active:translate-y-1 shadow-[8px_8px_0px_0px_#000] lg:shadow-[10px_10px_0px_0px_#000] whitespace-nowrap w-48 lg:w-56 flex items-center justify-center leading-none"
+                    >
+                        NO
+                    </motion.button>
+                )}
+            </AnimatePresence>
 
             {/* CARD */}
             <div className="bg-white border-[6px] lg:border-[8px] border-black pt-8 lg:pt-28 pb-6 lg:pb-16 px-6 lg:px-10 shadow-[20px_20px_0px_0px_#000] lg:shadow-[30px_30px_0px_0px_#000] max-w-[95vw] lg:max-w-4xl w-full text-center flex flex-col items-center justify-between relative overflow-visible min-h-[650px] lg:min-h-[850px]">
@@ -271,14 +343,40 @@ const QuestionScreen = ({ onYes }) => {
                             </div>
                         </div>
 
-                        <motion.button
-                            onClick={() => onYes()}
-                            animate={{ left: `${mousePos.x}%`, top: `${mousePos.y}%`, scale: yesScale, opacity: isMouseMoving ? 0.3 : 1 }}
-                            style={{ position: 'absolute', transform: 'translate(-50%, -50%)', zIndex: 1000 }}
-                            className="bg-green-500 hover:bg-green-600 text-white font-black py-6 px-20 border-6 border-black text-5xl shadow-[10px_10px_0px_0px_#000] active:translate-x-1 active:translate-y-1 flex items-center justify-center"
-                        >
-                            YES!
-                        </motion.button>
+                        <AnimatePresence>
+                            {noCount >= 15 && (
+                                <motion.button
+                                    key="big-yes-button"
+                                    onClick={() => {
+                                        playPopSound();
+                                        triggerPoof(mousePos.x, mousePos.y);
+                                        onYes();
+                                    }}
+                                    initial={{ scale: 0, opacity: 0 }}
+                                    exit={{ scale: 0, opacity: 0, filter: "blur(15px)", transition: { duration: 0.4 } }}
+                                    whileTap={{
+                                        brightness: 0.8,
+                                        y: 5,
+                                        transition: { duration: 0.1 }
+                                    }}
+                                    animate={{
+                                        left: `${mousePos.x}%`,
+                                        top: `${mousePos.y}%`,
+                                        scale: yesScale,
+                                        opacity: isMouseMoving ? 0.3 : 1
+                                    }}
+                                    transition={{
+                                        left: { type: "tween", ease: "linear", duration: 0 },
+                                        top: { type: "tween", ease: "linear", duration: 0 },
+                                        scale: { type: "spring", stiffness: 400, damping: 25 }
+                                    }}
+                                    style={{ position: 'absolute', transform: 'translate(-50%, -50%)', zIndex: 1000 }}
+                                    className="bg-green-500 hover:bg-green-600 text-white font-black py-6 px-20 border-6 border-black text-5xl shadow-[10px_10px_0px_0px_#000] active:translate-x-1 active:translate-y-1 flex items-center justify-center pointer-events-auto"
+                                >
+                                    YES!
+                                </motion.button>
+                            )}
+                        </AnimatePresence>
                     </div>
                 )}
 
@@ -307,39 +405,118 @@ const QuestionScreen = ({ onYes }) => {
 
                 {noCount < 13 && <div className="flex-grow w-full" />}
 
-                {noCount < 13 && (
-                    <div className={`flex ${isTrickActive ? 'flex-col-reverse lg:flex-row-reverse' : 'flex-col lg:flex-row'} items-center justify-center gap-6 lg:gap-24 relative w-full pt-6 pb-2 lg:pb-10`}>
-                        <motion.button
-                            animate={{ opacity: 1, scale: yesScale }}
-                            onHoverStart={() => { if (noCount === 2) setIsTrickActive(false); }}
-                            onTouchStart={() => { if (noCount === 2) setIsTrickActive(false); }}
-                            onClick={(e) => {
-                                if (isInteractionBlocked) return;
-                                e.stopPropagation();
-                                if (noCount === 1) { setNoCount(2); return; }
-                                if (noCount === 2) { setNoCount(3); return; }
-                                onYes();
+                <AnimatePresence mode="wait">
+                    {noCount < 13 && (
+                        <motion.div
+                            key="interaction-container"
+                            exit={{
+                                opacity: 0,
+                                transition: { staggerChildren: 0.1 }
                             }}
-                            className={`bg-green-500 hover:bg-green-600 hover:opacity-90 text-white font-black py-4 lg:py-5 px-10 lg:px-16 border-4 lg:border-6 border-black text-2xl lg:text-3xl relative z-10 w-48 lg:w-56 flex items-center justify-center leading-none transition-all ${yesScale <= 1 ? 'shadow-[8px_8px_0px_0px_#000] lg:shadow-[10px_10px_0px_0px_#000] active:translate-x-1 active:translate-y-1' : ''}`}
+                            className={`flex ${isTrickActive ? 'flex-col-reverse lg:flex-row-reverse' : 'flex-col lg:flex-row'} items-center justify-center gap-6 lg:gap-24 relative w-full pt-6 pb-2 lg:pb-10`}
                         >
-                            YES!
-                        </motion.button>
-
-                        {!hasStartedRunning && !isVanish && (
                             <motion.button
-                                ref={noBtnRef}
-                                onHoverStart={() => { isHoveringNo.current = true; handleNoHover(); }}
-                                onHoverEnd={() => { isHoveringNo.current = false; }}
-                                onTouchStart={() => { isHoveringNo.current = true; handleNoHover(); }}
-                                onTouchEnd={() => { isHoveringNo.current = false; }}
-                                onClick={handleNoClick}
-                                className="bg-red-500 hover:bg-red-600 hover:opacity-90 text-white font-black py-4 lg:py-5 px-10 lg:px-16 border-4 lg:border-6 border-black text-2xl lg:text-3xl relative z-10 shadow-[8px_8px_0px_0px_#000] lg:shadow-[10px_10px_0px_0px_#000] active:translate-x-1 active:translate-y-1 w-48 lg:w-56 flex items-center justify-center leading-none transition-all"
+                                key="initial-yes-button"
+                                exit={{
+                                    opacity: 0,
+                                    scale: 1.5,
+                                    filter: "blur(20px)",
+                                    transition: { duration: 0.3 }
+                                }}
+                                animate={{ opacity: 1, scale: yesScale }}
+                                whileTap={{
+                                    y: 5,
+                                    filter: "brightness(0.9)",
+                                    transition: { duration: 0.1 }
+                                }}
+                                onHoverStart={() => { if (noCount === 2) setIsTrickActive(false); }}
+                                onTouchStart={() => { if (noCount === 2) setIsTrickActive(false); }}
+                                onClick={(e) => {
+                                    if (isInteractionBlocked) return;
+                                    e.stopPropagation();
+                                    if (noCount === 1) { setNoCount(2); return; }
+                                    if (noCount === 2) { setNoCount(3); return; }
+                                    playPopSound();
+                                    onYes();
+                                }}
+                                className={`bg-green-500 hover:bg-green-600 hover:opacity-90 text-white font-black py-4 lg:py-5 px-10 lg:px-16 border-4 lg:border-6 border-black text-2xl lg:text-3xl relative z-10 w-48 lg:w-56 flex items-center justify-center leading-none transition-all ${yesScale <= 1 ? 'shadow-[8px_8px_0px_0px_#000] lg:shadow-[10px_10px_0px_0px_#000] active:translate-x-1 active:translate-y-1 active:shadow-none' : ''}`}
                             >
-                                NO
+                                YES!
                             </motion.button>
-                        )}
-                    </div>
-                )}
+
+                            <AnimatePresence>
+                                {!hasStartedRunning && !isVanish && (
+                                    <motion.button
+                                        ref={noBtnRef}
+                                        key="initial-no-button"
+                                        exit={{
+                                            opacity: 0,
+                                            scale: 0.5,
+                                            filter: "blur(10px)",
+                                            transition: { duration: 0.2 }
+                                        }}
+                                        whileTap={{
+                                            scale: 0.93,
+                                            transition: { duration: 0.1 }
+                                        }}
+                                        onHoverStart={() => { isHoveringNo.current = true; handleNoHover(); }}
+                                        onHoverEnd={() => { isHoveringNo.current = false; }}
+                                        onTouchStart={() => { isHoveringNo.current = true; handleNoHover(); }}
+                                        onTouchEnd={() => { isHoveringNo.current = false; }}
+                                        onClick={(e) => {
+                                            if (isVanish) return;
+                                            handleNoClick(e);
+                                        }}
+                                        className="bg-red-500 hover:bg-red-600 hover:opacity-90 text-white font-black py-4 lg:py-5 px-10 lg:px-16 border-4 lg:border-6 border-black text-2xl lg:text-3xl relative z-10 shadow-[8px_8px_0px_0px_#000] lg:shadow-[10px_10px_0px_0px_#000] active:translate-x-1 active:translate-y-1 active:shadow-none w-48 lg:w-56 flex items-center justify-center leading-none transition-all"
+                                    >
+                                        NO
+                                    </motion.button>
+                                )}
+                            </AnimatePresence>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+
+                {/* VISUAL POOF CLOUDS */}
+                {poofs.map(p => (
+                    <motion.div
+                        key={p.id}
+                        initial={{ opacity: 0, scale: 0.5 }}
+                        animate={{ opacity: 1, scale: 1.2 }}
+                        exit={{ opacity: 0, scale: 1.5 }}
+                        style={{
+                            position: 'absolute',
+                            left: `${p.x}%`,
+                            top: `${p.y}%`,
+                            transform: 'translate(-50%, -50%)',
+                            zIndex: 300,
+                            pointerEvents: 'none'
+                        }}
+                        className="flex items-center justify-center"
+                    >
+                        <div className="relative">
+                            {/* Literal Comic Cloud Shape */}
+                            <div className="w-16 h-16 bg-white rounded-full border-2 border-gray-200 absolute -top-8 -left-8 shadow-xl" />
+                            <div className="w-20 h-20 bg-white rounded-full border-2 border-gray-200 absolute -top-10 left-0 shadow-lg" />
+                            <div className="w-16 h-16 bg-white rounded-full border-2 border-gray-200 absolute -top-8 left-10 shadow-xl" />
+                            <div className="w-12 h-12 bg-white rounded-full border-2 border-gray-200 absolute -top-2 -left-12 shadow-md" />
+                            <div className="w-12 h-12 bg-white rounded-full border-2 border-gray-200 absolute -top-2 left-16 shadow-md" />
+
+                            {/* Inner filler for solid cloud look */}
+                            <div className="w-24 h-12 bg-white rounded-full absolute -top-4 -left-2" />
+
+                            {/* Comic Spark/Star Puffs */}
+                            {[0, 72, 144, 216, 288].map((angle, i) => (
+                                <motion.div
+                                    key={i}
+                                    initial={{ scale: 0, x: 0, y: 0 }}
+                                    animate={{ scale: 1, x: Math.cos(angle * Math.PI / 180) * 45, y: Math.sin(angle * Math.PI / 180) * 45 }}
+                                    className="absolute w-3 h-3 bg-yellow-400 rotate-45"
+                                />
+                            ))}
+                        </div>
+                    </motion.div>
+                ))}
 
 
             </div>
