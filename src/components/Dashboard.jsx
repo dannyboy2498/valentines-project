@@ -30,9 +30,16 @@ const MemoryItem = ({ item, index }) => {
                 }
             }}
             onMouseLeave={() => {
+                if (videoRef.current) videoRef.current.muted = true;
+            }}
+            onTouchStart={() => {
                 if (videoRef.current) {
-                    videoRef.current.muted = true;
+                    videoRef.current.muted = false;
+                    videoRef.current.play().catch(() => { });
                 }
+            }}
+            onTouchEnd={() => {
+                if (videoRef.current) videoRef.current.muted = true;
             }}
         >
             {isVideo ? (
@@ -154,19 +161,23 @@ const Dashboard = ({ showFireworks = true }) => {
     };
 
     const handleCardClick = (e) => {
+        // PRIORITY: Ignore if clicking a button or interactive element
+        if (e.target.closest('button') || e.target.closest('a')) return;
+
         const rect = e.currentTarget.getBoundingClientRect();
-        const clientX = e.clientX || (e.changedTouches && e.changedTouches[0].clientX);
-        if (!clientX) return;
+        const clientX = (e.clientX !== undefined) ? e.clientX : (e.changedTouches && e.changedTouches[0].clientX);
+        if (clientX === undefined) return;
 
         const x = clientX - rect.left;
         const width = rect.width;
 
-        // If clicked middle and undiscovered content exists, go forward
-        if (x >= width * 0.3 && x <= width * 0.7 && discoveredTabs.size < tabs.length) {
-            navigate(1);
-        } else if (x < width * 0.3) {
+        // Smart Navigation: Only navigate on sides, OR middle if more content exists
+        if (x < width * 0.3) {
             navigate(-1);
-        } else {
+        } else if (x > width * 0.7) {
+            navigate(1);
+        } else if (discoveredTabs.size < tabs.length) {
+            // Only go forward from middle if we haven't seen everything
             navigate(1);
         }
     };
@@ -201,7 +212,7 @@ const Dashboard = ({ showFireworks = true }) => {
     };
 
     return (
-        <div className="min-h-full w-full pt-12 lg:pt-20 pb-48 px-4 flex flex-col items-center justify-start bg-transparent overflow-visible relative">
+        <div className="min-h-[100dvh] w-full pt-4 lg:pt-20 pb-40 lg:pb-48 px-4 flex flex-col items-center justify-center bg-transparent overflow-visible relative">
             <HeartParticles zIndex={0} />
             {showFireworks && <FireworksOverlay />}
             <audio ref={audioRef} src={DASHBOARD_CONTENT.musicPath} loop />
@@ -354,26 +365,27 @@ const Dashboard = ({ showFireworks = true }) => {
                                     </div>
                                     <button
                                         onClick={getNewReason}
-                                        className="mt-4 lg:mt-6 w-full bg-pink-500 hover:bg-pink-600 text-white font-black py-3 lg:py-4 border-[3px] lg:border-4 border-black shadow-[3px_3px_0px_0px_#000] lg:shadow-[4px_4px_0px_0px_#000] active:translate-x-1 active:translate-y-1 active:shadow-none uppercase text-xs lg:text-base tracking-widest"
+                                        onTouchEnd={getNewReason}
+                                        className="mt-4 lg:mt-6 w-full bg-pink-500 hover:bg-pink-600 text-white font-black py-3 lg:py-4 border-[3px] lg:border-4 border-black shadow-[3px_3px_0px_0px_#000] lg:shadow-[4px_4px_0px_0px_#000] active:translate-x-1 active:translate-y-1 active:shadow-none uppercase text-xs lg:text-base tracking-widest relative z-20"
                                     >
                                         TELL ME ANOTHER
                                     </button>
                                 </div>
+                            </div>
 
-                                {/* MESSAGE BOX (NOW BELOW REASONS) */}
-                                <div className="border-[3px] lg:border-4 border-black p-4 lg:p-6 bg-violet-50 shadow-[4px_4px_0px_0px_#000] lg:shadow-[6px_6px_0px_0px_#000]">
-                                    <p
-                                        className="text-sm lg:text-lg font-black italic text-gray-800 leading-[1.2] lg:leading-tight mb-4 lg:mb-8"
-                                        dangerouslySetInnerHTML={{
-                                            __html: DASHBOARD_CONTENT.personalMessage
-                                                .replace(/\\n/g, '<br/>')
-                                                .replace(/\n/g, '<br/>')
-                                                .replace(/\*\*(.*?)\*\*/g, '<span class="text-pink-600 font-black">$1</span>')
-                                        }}
-                                    />
-                                    <div className="text-right border-t-[2px] border-black/10 pt-2 lg:pt-4">
-                                        <p className="font-black text-pink-600 text-base lg:text-xl italic">{DASHBOARD_CONTENT.signature}</p>
-                                    </div>
+                            {/* MESSAGE BOX (NOW BELOW REASONS) */}
+                            <div className="border-[3px] lg:border-4 border-black p-4 lg:p-6 bg-violet-50 shadow-[4px_4px_0px_0px_#000] lg:shadow-[6px_6px_0px_0px_#000]">
+                                <p
+                                    className="text-sm lg:text-lg font-black italic text-gray-800 leading-[1.2] lg:leading-tight mb-4 lg:mb-8"
+                                    dangerouslySetInnerHTML={{
+                                        __html: DASHBOARD_CONTENT.personalMessage
+                                            .replace(/\\n/g, '<br/>')
+                                            .replace(/\n/g, '<br/>')
+                                            .replace(/\*\*(.*?)\*\*/g, '<span class="text-pink-600 font-black">$1</span>')
+                                    }}
+                                />
+                                <div className="text-right border-t-[2px] border-black/10 pt-2 lg:pt-4">
+                                    <p className="font-black text-pink-600 text-base lg:text-xl italic">{DASHBOARD_CONTENT.signature}</p>
                                 </div>
                             </div>
                         </motion.div>
@@ -427,18 +439,19 @@ const Dashboard = ({ showFireworks = true }) => {
 
             {/* MUSIC PLAYER - WINDOW PINNED (PORTAL) */}
             {createPortal(
-                <div className="fixed bottom-6 lg:bottom-10 left-6 lg:left-10 z-[200] pointer-events-none">
+                <div className="fixed bottom-4 lg:bottom-10 left-4 lg:left-10 z-[200] pointer-events-none">
                     <motion.div
                         initial={{ opacity: 0, x: -50 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: 1 }}
                         className="pointer-events-auto"
                     >
-                        <div className="flex items-center gap-5 lg:gap-7 items-end">
+                        <div className="flex flex-col lg:flex-row items-center lg:items-end gap-2 lg:gap-7">
                             {/* Spinning Icon / Mute Toggle */}
                             <button
                                 onClick={toggleMute}
-                                className={`w-14 h-14 lg:w-19 lg:h-19 bg-yellow-400 border-[3px] lg:border-4 border-black flex items-center justify-center shadow-[4px_4px_0px_0px_#000] lg:shadow-[6px_6px_0px_0px_#000] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all relative overflow-hidden group mb-2 lg:mb-[11px] ${isPlaying ? 'animate-spin-slow' : ''}`}
+                                onTouchEnd={toggleMute}
+                                className={`w-14 h-14 lg:w-19 lg:h-19 bg-yellow-400 border-[3px] lg:border-4 border-black flex items-center justify-center shadow-[4px_4px_0px_0px_#000] lg:shadow-[6px_6px_0px_0px_#000] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all relative overflow-hidden group ${isPlaying ? 'animate-spin-slow' : ''}`}
                             >
                                 <Music className="w-7 h-7 lg:w-9 lg:h-9 text-black transition-opacity" style={{ opacity: isMuted ? 0.4 : 1 }} />
 
@@ -451,11 +464,11 @@ const Dashboard = ({ showFireworks = true }) => {
                             </button>
 
                             {/* Song Info */}
-                            <div className="flex flex-col min-w-0 mb-[13.5px] lg:mb-[18.5px]">
-                                <p className="text-[11px] lg:text-lg font-black text-black uppercase tracking-tighter w-auto max-w-[75px] lg:max-w-[180px] leading-[1.1] mb-1 lg:mb-1.5 italic line-clamp-2 overflow-hidden">
+                            <div className="flex flex-col items-center lg:items-start min-w-0 mb-0 lg:mb-[18.5px]">
+                                <p className="text-[10px] lg:text-lg font-black text-black uppercase tracking-tighter w-auto max-w-[90px] lg:max-w-[180px] leading-[1.1] mb-0.5 lg:mb-1.5 italic line-clamp-2 overflow-hidden text-center lg:text-left">
                                     {DASHBOARD_CONTENT.musicTitle}
                                 </p>
-                                <p className="text-[8px] lg:text-[10px] text-pink-500 font-bold uppercase tracking-[0.2em] leading-none mt-1 lg:mt-1.5">
+                                <p className="text-[7px] lg:text-[10px] text-pink-500 font-bold uppercase tracking-[0.2em] leading-none">
                                     {isMuted ? 'Muted' : 'Now Playing'}
                                 </p>
                             </div>
@@ -463,10 +476,11 @@ const Dashboard = ({ showFireworks = true }) => {
                     </motion.div>
                 </div>,
                 document.body
-            )}
+            )
+            }
 
             {/* GLOBAL NAVIGATION BAR - BOTTOM CENTER */}
-            <div className="absolute bottom-6 lg:bottom-10 left-1/2 -translate-x-1/2 z-[60] pointer-events-none">
+            <div className="fixed bottom-22 lg:bottom-10 left-1/2 -translate-x-1/2 z-[60] pointer-events-none">
                 <motion.div
                     layout
                     className="flex items-center gap-3 lg:gap-4 pointer-events-auto bg-white/95 backdrop-blur-sm border-[3px] lg:border-4 border-black p-2 lg:p-3 shadow-[6px_6px_0px_0px_#000] lg:shadow-[8px_8px_0px_0px_#000]"
@@ -489,6 +503,7 @@ const Dashboard = ({ showFireworks = true }) => {
                                 key={tab}
                                 layoutId={`nav-${tab}`}
                                 onClick={() => isDiscovered && handleTabChange(tab)}
+                                onTouchEnd={() => isDiscovered && handleTabChange(tab)}
                                 className={`w-12 h-12 lg:w-14 lg:h-14 flex items-center justify-center transition-all ${!isDiscovered
                                     ? 'bg-transparent border-none cursor-default'
                                     : `border-[3px] lg:border-4 border-black ${isActive
@@ -517,7 +532,7 @@ const Dashboard = ({ showFireworks = true }) => {
                 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
                 .perspective-1000 { perspective: 1000px; }
             `}} />
-        </div>
+        </div >
     );
 };
 
