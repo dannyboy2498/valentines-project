@@ -204,6 +204,7 @@ const Dashboard = ({ showFireworks = true }) => {
         <div className="min-h-full w-full pt-12 lg:pt-20 pb-48 px-4 flex flex-col items-center justify-start bg-transparent overflow-visible relative">
             <HeartParticles zIndex={0} />
             {showFireworks && <FireworksOverlay />}
+            <audio ref={audioRef} src={DASHBOARD_CONTENT.musicPath} loop />
 
             {/* THE VIEW DECK CONTAINER */}
             <div
@@ -293,7 +294,6 @@ const Dashboard = ({ showFireworks = true }) => {
                                 )}
                             </div>
 
-                            <audio ref={audioRef} src={DASHBOARD_CONTENT.musicPath} loop />
 
                             <div className="text-center flex-grow flex flex-col items-center justify-center">
                                 <Heart className="w-6 h-6 lg:w-9 lg:h-9 text-red-500 fill-red-500 mb-1" />
