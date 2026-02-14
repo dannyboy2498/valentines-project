@@ -1,11 +1,66 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { reasons } from '../data/reasons';
-import { Heart, Camera, Images, BookHeart, Star, Home, ChevronRight, ChevronLeft } from 'lucide-react';
+import { Heart, Camera, Images, BookHeart, Star, Home, ChevronRight, ChevronLeft, Play } from 'lucide-react';
 import FireworksOverlay from './FireworksOverlay';
 import { IMAGE_ASSETS } from '../config/assets';
 import { DASHBOARD_CONTENT } from '../config/content';
 import HeartParticles from './HeartParticles';
+
+const MemoryItem = ({ item, index }) => {
+    const [isWide, setIsWide] = useState(false);
+    const videoRef = useRef(null);
+    const url = item.url;
+    const isVideo = /\.(mp4|webm|mov|ogg|m4v)$/i.test(url);
+
+    const checkWide = (w, h) => {
+        // threshold to consider it "wide" enough to span both columns
+        if (w > h * 1.2) setIsWide(true);
+    };
+
+    return (
+        <div
+            className={`${isWide ? 'col-span-2 aspect-video' : 'aspect-square'} border-[3px] lg:border-4 border-black bg-gray-100 shadow-[3px_3px_0px_0px_#000] lg:shadow-[4px_4px_0px_0px_#000] relative overflow-hidden group transition-all duration-300 ease-out`}
+            onMouseEnter={() => {
+                if (videoRef.current) {
+                    videoRef.current.muted = false;
+                    videoRef.current.play().catch(() => { });
+                }
+            }}
+            onMouseLeave={() => {
+                if (videoRef.current) {
+                    videoRef.current.muted = true;
+                }
+            }}
+        >
+            {isVideo ? (
+                <video
+                    ref={videoRef}
+                    src={url}
+                    onLoadedMetadata={(e) => checkWide(e.target.videoWidth, e.target.videoHeight)}
+                    muted
+                    loop
+                    playsInline
+                    autoPlay
+                    className="w-full h-full object-cover"
+                />
+            ) : (
+                <img
+                    src={url}
+                    alt={`Memory ${index + 1}`}
+                    onLoad={(e) => checkWide(e.target.naturalWidth, e.target.naturalHeight)}
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                />
+            )}
+
+            {isVideo && (
+                <div className="absolute top-2 right-2 bg-black/40 backdrop-blur-md text-white p-1.5 rounded-full pointer-events-none ring-1 ring-white/20">
+                    <Play size={10} fill="currentColor" />
+                </div>
+            )}
+        </div>
+    );
+};
 
 const Dashboard = ({ showFireworks = true }) => {
     const [activeTab, setActiveTab] = useState('cover'); // 'cover' | 'reasons' | 'memories'
@@ -298,7 +353,7 @@ const Dashboard = ({ showFireworks = true }) => {
 
                             {/* Scrollable Gallery Area */}
                             <div className="flex-grow overflow-y-auto no-scrollbar pr-1">
-                                <div className="grid grid-cols-2 gap-3 lg:gap-4 mb-6">
+                                <div className="grid grid-cols-2 gap-3 lg:gap-4 mb-6 grid-flow-dense">
                                     {DASHBOARD_CONTENT.memories.length > 0 ? (
                                         DASHBOARD_CONTENT.memories.map((item, i) => (
                                             item.type === 'header' ? (
@@ -308,9 +363,7 @@ const Dashboard = ({ showFireworks = true }) => {
                                                     </p>
                                                 </div>
                                             ) : (
-                                                <div key={i} className="aspect-square border-[3px] lg:border-4 border-black bg-gray-100 shadow-[3px_3px_0px_0px_#000] lg:shadow-[4px_4px_0px_0px_#000] relative overflow-hidden group">
-                                                    <img src={item.url} alt={`Memory ${i + 1}`} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110" />
-                                                </div>
+                                                <MemoryItem key={i} item={item} index={i} />
                                             )
                                         ))
                                     ) : (
