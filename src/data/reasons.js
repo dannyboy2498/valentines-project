@@ -1,4 +1,8 @@
-export const reasons = [
+// This will match reasons.json ONLY if it exists, preventing build errors if missing
+const customModules = import.meta.glob('./reasons.json', { eager: true, import: 'default' });
+const customReasons = Object.values(customModules)[0];
+
+const defaultReasons = [
     "Your smile lights up my entire world.",
     "The way you laugh at my terrible jokes.",
     "Your kindness towards everyone you meet.",
@@ -15,3 +19,5 @@ export const reasons = [
     "Your resilience in the face of challenges.",
     "Because you are simply, wonderfully YOU."
 ];
+
+export const reasons = (customReasons && customReasons.length > 0) ? customReasons : defaultReasons;

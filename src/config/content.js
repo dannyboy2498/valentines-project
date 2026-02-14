@@ -51,4 +51,3 @@ export const DASHBOARD_CONTENT = {
     unlockTime: import.meta.env.VITE_UNLOCK_TIME || "00:00:00",
     timezone: import.meta.env.VITE_TIMEZONE || "America/Guayaquil", // e.g., "America/Guayaquil", "Europe/London", "UTC"
 };
-

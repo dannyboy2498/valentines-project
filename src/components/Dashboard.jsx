@@ -81,9 +81,10 @@ const Dashboard = ({ showFireworks = true }) => {
     const getNewReason = (e) => {
         e.stopPropagation();
         let newReason = currentReason;
-        while (reasons.length > 1 && newReason === currentReason) {
-            const randomIndex = Math.floor(Math.random() * reasons.length);
-            newReason = reasons[randomIndex];
+        const availableReasons = reasons;
+        while (availableReasons.length > 1 && newReason === currentReason) {
+            const randomIndex = Math.floor(Math.random() * availableReasons.length);
+            newReason = availableReasons[randomIndex];
         }
         setCurrentReason(newReason);
     };
